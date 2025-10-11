@@ -267,7 +267,7 @@ EIN 42-1745656
     info.forEach(item => {
       const { lane, raised, goal } = item;
       const pct = clamp(goal > 0 ? (raised / goal) * 100 : 0, 0, 100);
-      const avatar = lane.querySelector('.avatar img');
+      const avatar = lane.querySelector('.avatar');
       if (avatar) avatar.style.left = `calc(${pct.toFixed(2)}% - 35px)`;
       const label = lane.querySelector('.progress-text');
       if (label) label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
