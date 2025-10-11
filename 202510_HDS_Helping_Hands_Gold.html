@@ -228,9 +228,52 @@ A 501(c)(3) Public Charity
 EIN 42-1745656
     </footer>
   </div>
-
-  <!-- Live data from CSV (robust parser + ranking + cache-bust) -->
-  <script>
-  (async function () {
-    const CSV_URL = "const CSV_URL = "https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";";
-    const withBust = CSV_URL +
+  
+<!-- Live data from CSV (robust parser + ranking + cache-bust) -->
+<script>
+(async function () {
+  const CSV_URL = "https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
+  const withBust = CSV_URL + "?t=" + Date.now();
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/);
+    if (!lines.length) return [];
+    const headers = lines.shift().split(',').map(h => h.trim());
+    return lines.map(line => {
+      const cells = line.split(',').map(c => c.trim());
+      const row = {};
+      headers.forEach((h, i) => row[h] = cells[i] || '');
+      return row;
+    });
+  }
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const fmt = n => Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  try {
+    const resp = await fetch(withBust, { cache: 'no-store' });
+    const csv = await resp.text();
+    const rows = parseCSV(csv);
+    const map = new Map(rows.map(r => [r.Name, r]));
+    const lanes = Array.from(document.querySelectorAll('.lane[data-name]'));
+    const info = [];
+    lanes.forEach(lane => {
+      const name = lane.getAttribute('data-name');
+      const data = map.get(name) || {};
+      const raised = Number(data.Raised || 0);
+      const goal = Number(data.Goal || 10000);
+      info.push({ lane, name, raised, goal });
+    });
+    info.sort((a, b) => b.raised - a.raised);
+    const container = document.querySelector('.track');
+    info.forEach(item => {
+      const { lane, raised, goal } = item;
+      const pct = clamp(goal > 0 ? (raised / goal) * 100 : 0, 0, 100);
+      const avatar = lane.querySelector('.avatar img');
+      if (avatar) avatar.style.left = `calc(${pct.toFixed(2)}% - 35px)`;
+      const label = lane.querySelector('.progress-text');
+      if (label) label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
+      container.appendChild(lane);
+    });
+  } catch (err) {
+    console.error('Failed to load sheet:', err);
+  }
+})();
+</script>
