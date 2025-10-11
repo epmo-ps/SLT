@@ -13,110 +13,41 @@
     --bg:#f7f7f7;
     --card:#ffffff;
     --border:#e8e8e8;
-    --name-col:200px;          /* sleeker name column */
-    --lane-h:92px;             /* lane height */
+    --name-col:200px;
+    --lane-h:92px;
     --maxw:980px;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; padding:18px 12px 36px;
-    font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg); color:#111;
-  }
-  .wrap{max-width:var(--maxw); margin:0 auto;}
+  body{margin:0;padding:18px 12px 36px;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:#111;}
+  .wrap{max-width:var(--maxw);margin:0 auto;}
 
-  /* Sleeker header */
-  header{ text-align:center; margin-bottom:12px; }
-  header h1{
-    font-family:Oswald,Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;
-    font-size:clamp(26px,5vw,40px);
-    margin:0 0 4px;
-  }
-  header .lead{
-    margin:0;
-    font-size:clamp(14px,3.2vw,16px);
-  }
-  header .lead a{
-    color:#0a58ca; text-decoration:none; border-bottom:1px dotted currentColor;
-  }
+  header{text-align:center;margin-bottom:12px;}
+  header h1{font-family:Oswald,Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;font-size:clamp(26px,5vw,40px);margin:0 0 4px;}
+  header .lead{margin:0;font-size:clamp(14px,3.2vw,16px);}
+  header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted currentColor;}
 
-  /* Campaign date bar */
-  .campaign{
-    margin:14px auto 8px; max-width:520px;
-  }
-  .campaign-bar{
-    height:10px; border-radius:6px; background:#e1e1e1; overflow:hidden;
-  }
-  .campaign-fill{
-    height:100%; width:0%; background:var(--brand); transition:width 1s ease;
-  }
-  .campaign-labels{
-    display:flex; justify-content:space-between; font-size:12.5px; color:#555; margin-top:4px;
-    padding:0 2px;
-  }
+  .campaign{margin:14px auto 8px;max-width:520px;}
+  .campaign-bar{height:10px;border-radius:6px;background:#e1e1e1;overflow:hidden;}
+  .campaign-fill{height:100%;width:0%;background:var(--brand);transition:width 1s ease;}
+  .campaign-labels{display:flex;justify-content:space-between;font-size:12.5px;color:#555;margin-top:4px;padding:0 2px;}
 
-  /* Board & lanes */
-  .board{
-    background:var(--card); border:1px solid var(--border); border-radius:14px;
-    padding:12px; box-shadow:0 1px 2px rgba(0,0,0,.04);
-  }
-  .lane{
-    display:grid;
-    grid-template-columns: var(--name-col) 1fr;
-    column-gap:14px;
-    align-items:center;
-    background:#fff;
-    border:2px dotted var(--brand);
-    border-radius:12px;
-    padding:10px;
-    min-height:var(--lane-h);
-    margin:8px 0;
-    overflow:hidden;
-  }
-  .name{
-    font-family:Oswald,system-ui; font-size:clamp(16px,3.4vw,20px);
-    padding-left:4px; word-break:break-word;
-  }
+  .board{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .lane{display:grid;grid-template-columns:var(--name-col) 1fr;column-gap:14px;align-items:center;background:#fff;border:2px dotted var(--brand);border-radius:12px;padding:10px;min-height:var(--lane-h);margin:8px 0;overflow:hidden;}
+  .name{font-family:Oswald,system-ui;font-size:clamp(16px,3.4vw,20px);padding-left:4px;word-break:break-word;}
 
-  /* Track area: avatars move only inside here */
-  .track-area{
-    position:relative;
-    height:calc(var(--lane-h) - 22px);
-    border-radius:10px;
-    background:#fff;
-    overflow:hidden;
-    display:flex; align-items:center;
-  }
-  /* Yellow start line (visible) */
-  .start-line{
-    position:absolute; left:10px; top:0; bottom:0; width:4px; background:var(--brand); border-radius:3px;
-  }
+  .track-area{position:relative;height:calc(var(--lane-h) - 22px);border-radius:10px;background:#fff;overflow:hidden;display:flex;align-items:center;}
+  .start-line{position:absolute;left:10px;top:0;bottom:0;width:4px;background:var(--brand);border-radius:3px;}
 
-  .avatar{
-    position:absolute; top:50%; transform:translateY(-50%);
-    left:10px; height:calc(var(--lane-h) - 34px);
-    transition:left .6s ease;
-  }
-  .avatar img{
-    height:100%; width:auto; border-radius:10px; background:#fff;
-    border:2px solid var(--brand); box-shadow:0 1px 2px rgba(0,0,0,.08);
-  }
+  .avatar{position:absolute;top:50%;transform:translateY(-50%);left:10px;height:calc(var(--lane-h) - 34px);transition:left .6s ease;}
+  .avatar img{height:100%;width:auto;border-radius:10px;background:#fff;border:2px solid var(--brand);box-shadow:0 1px 2px rgba(0,0,0,.08);}
 
-  .progress{
-    position:absolute; right:8px; bottom:8px;
-    background:#fff; border:1px solid var(--border);
-    padding:4px 10px; border-radius:10px;
-    font-size:13.5px; font-weight:600; color:#222;
-    white-space:nowrap;
-  }
+  .progress{position:absolute;right:8px;bottom:8px;background:#fff;border:1px solid var(--border);padding:4px 10px;border-radius:10px;font-size:13.5px;font-weight:600;color:#222;white-space:nowrap;}
 
-  footer{
-    margin-top:16px; text-align:center; color:#444; font-size:13px; line-height:1.35; white-space:pre-line;
-  }
+  footer{margin-top:16px;text-align:center;color:#444;font-size:13px;line-height:1.35;white-space:pre-line;}
 
   @media (max-width:640px){
-    :root{ --name-col:150px; --lane-h:88px; }
-    .board{ padding:10px; }
+    :root{--name-col:150px;--lane-h:88px}
+    .board{padding:10px}
   }
 </style>
 </head>
@@ -127,14 +58,14 @@
       <p class="lead">👉 <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank" rel="noopener">Donate Here</a> – HD Supply Helping Hand! Ready, set, GIVE! 🏁</p>
     </header>
 
-    <!-- Campaign timeline: Oct 1 → Oct 31 -->
+    <!-- Campaign timeline -->
     <div class="campaign" aria-label="Campaign timeline">
       <div class="campaign-bar"><div class="campaign-fill" id="campaignFill"></div></div>
       <div class="campaign-labels"><span>Start Oct 1</span><span>Finish Oct 31</span></div>
     </div>
 
     <section class="board" id="leaderboard">
-      <!-- Use FIRST names for display, keep full names in data-name to match CSV -->
+      <!-- Display first names, keep full names in data-name (must match CSV) -->
       <div class="lane" data-name="Sheila Schnellenberger">
         <div class="name">Sheila</div>
         <div class="track-area">
@@ -225,7 +156,7 @@ EIN 42-1745656
   </div>
 
 <script>
-/* Campaign timeline: Oct 1 → Oct 31 (auto-fills based on today) */
+/* Campaign timeline (Oct 1 → Oct 31) */
 (function(){
   const start=new Date("2025-10-01T00:00:00");
   const end=new Date("2025-10-31T23:59:59");
@@ -238,7 +169,7 @@ EIN 42-1745656
   fill.style.width=pct.toFixed(1)+"%";
 })();
 
-/* Live CSV → rank lanes → move avatars only between name and amount */
+/* CSV → rank → move avatars between start line and amount badge */
 (async function () {
   const CSV_URL="https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
   const withBust=CSV_URL+(CSV_URL.includes("?")?"&":"?")+"t="+Date.now();
@@ -273,12 +204,12 @@ EIN 42-1745656
       return { lane, name, raised, goal };
     });
 
-    // sort by amount raised
+    // sort and re-append
     laneData.sort((a,b)=>b.raised-a.raised);
     const board=document.getElementById('leaderboard');
     laneData.forEach(({lane})=>board.appendChild(lane));
 
-    layout(); // position avatars
+    layout();
   }
 
   function layout(){
@@ -291,26 +222,21 @@ EIN 42-1745656
 
       const pct=clamp(goal>0 ? (raised/goal)*100 : 0, 0, 100);
 
-      // Compute travel range *inside the track area* (between start line and amount badge)
-      const startX=(startLine?.offsetLeft||0)+(startLine?.offsetWidth||0)+8;  // just past the yellow line
+      const startX=(startLine?.offsetLeft||0)+(startLine?.offsetWidth||0)+8;
       const trackW=track.clientWidth;
       const labelW=label.offsetWidth;
       const avatarW=avatar.getBoundingClientRect().width||72;
-
-      // End just before the amount badge
       const endX=Math.max(startX, trackW - labelW - avatarW - 10);
 
       const moveX = startX + (pct/100) * (endX - startX);
       avatar.style.left = moveX + "px";
-
-      // Update amount text
       label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
     });
   }
 
   try{
     await loadAndRender();
-    window.addEventListener('resize', layout); // keep aligned on viewport changes
+    window.addEventListener('resize', layout);
   }catch(e){
     console.error('Failed to load CSV:', e);
   }
