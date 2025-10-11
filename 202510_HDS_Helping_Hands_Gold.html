@@ -2,220 +2,282 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HD Supply Helping Hand Race</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tony Drew for the Gold! – HD Supply Helping Hand</title>
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
-  body {
-    font-family: 'Montserrat', sans-serif;
-    background: #fff;
-    margin: 0;
-    padding: 1.0em;
-    color: #111;
+  :root{
+    --brand:#FFC907;
+    --bg:#f7f7f7;
+    --card:#ffffff;
+    --border:#e8e8e8;
+    --name-col:240px;         /* desktop name column */
+    --lane-h:96px;            /* lane height */
+    --maxw:980px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:20px 14px 40px;
+    font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:#111;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto;}
+  h1{
+    font-family:Oswald,Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;
+    font-size:clamp(28px,5vw,44px);
+    text-align:center; margin:6px 0 8px;
+  }
+  .lead{
+    text-align:center; margin:0 0 16px; font-size:clamp(14px,3.3vw,16px);
+  }
+  .lead a{ color:#0a58ca; text-decoration:none; border-bottom:1px dotted currentColor; }
+
+  /* Leaderboard card */
+  .board{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+  }
+  .lane{
+    position:relative;
+    display:grid;
+    grid-template-columns: var(--name-col) 1fr; /* name column + track */
+    column-gap:16px;
+    align-items:center;
+    background:#fff;
+    border:2px dotted var(--brand);
+    border-radius:12px;
+    padding:12px 12px;
+    min-height:var(--lane-h);
+    margin:10px 0;
+    overflow:hidden;
+  }
+  .name{
+    font-family:Oswald,system-ui;
+    font-size:clamp(16px,3.6vw,20px);
+    padding-left:4px;
+    white-space:normal;
+    word-break:break-word;
   }
 
-  h1 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 2em;
-    text-align: center;
-    margin-bottom: 0.3em;
+  /* Track area where the avatar moves */
+  .track-area{
+    position:relative;
+    height:calc(var(--lane-h) - 24px);
+    border-radius:10px;
+    background:#fff;
+  }
+  .start-line{
+    position:absolute; left:8px; top:0; bottom:0;
+    width:5px; background:var(--brand);
+    border-radius:3px;
   }
 
-  p {
-    text-align: left;
-    font-size: 1em;
-    margin: 0.2em 0;
+  .avatar{
+    position:absolute;
+    top:50%; transform:translateY(-50%);
+    left:0;                        /* JS updates this */
+    height:calc(var(--lane-h) - 36px);
+    display:flex; align-items:center; gap:10px;
+    transition:left .6s ease;
+  }
+  .avatar img{
+    height:100%;
+    width:auto;                    /* keep native rectangular heads */
+    border-radius:10px;
+    background:#fff;
+    border:2px solid var(--brand);
+    box-shadow:0 1px 2px rgba(0,0,0,.08);
   }
 
-  a {
-    color: #FFC907;
-    font-weight: 600;
-    text-decoration: none;
+  .progress{
+    position:absolute; right:8px; bottom:8px;
+    background:#fff;
+    border:1px solid var(--border);
+    padding:4px 10px; border-radius:10px;
+    font-size:14px; font-weight:600; color:#222;
   }
 
-  .track {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-    margin-top: 1.0em;
+  footer{
+    margin-top:18px; text-align:center;
+    color:#444; font-size:13px; line-height:1.35; white-space:pre-line;
   }
 
-  .lane {
-    position: relative;
-    border: 2px dotted #FFC907;
-    border-radius: 10px;
-    padding: 2.0em 2.0em;
-    overflow: hidden;
-    background: #fff;
-  }
-
-  .lane .name {
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.8em;
-    margin-left: 0.8em;
-  }
-
-  .avatar {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 0;
-    transition: left 0.6s ease;
-  }
-
-  .avatar img {
-    width: 75px;
-    height: 75px;
-    border-radius: 10px;
-    border: 3px solid #FFC907;
-    background: white;
-  }
-
-  .progress-text {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 0.9em;
-    font-weight: 600;
-  }
-
-  footer {
-    text-align: center;
-    font-size: 0.8em;
-    margin-top: 1.0em;
-    color: #555;
+  @media (max-width:640px){
+    :root{ --name-col:180px; --lane-h:92px; }
+    .board{ padding:10px; }
   }
 </style>
 </head>
 <body>
+  <div class="wrap">
+    <h1>Tony Drew for the Gold! 🏆</h1>
+    <p class="lead">👉 <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank" rel="noopener">Donate Here</a> now to support HD Supply Helping Hand! Ready, set, GIVE! 🏁</p>
 
-<h1>Tony Drew for the Gold! 🏆</h1>
-<p>👉 <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank">Donate Here</a> – HD Supply Helping Hand!</p>
-<p class="note" style="display:none;">Ready, set, GIVE! 🏁</p>
+    <div class="board" id="leaderboard">
+      <!-- data-name MUST EXACTLY MATCH the CSV "Name" column -->
+      <div class="lane" data-name="Sheila Schnellenberger">
+        <div class="name">Sheila Schnellenberger</div>
+        <div class="track-area">
+          <div class="start-line"></div>
+          <div class="avatar" style="left:10px;">
+            <img src="img/sheila.PNG" alt="Sheila headshot">
+          </div>
+          <div class="progress">$0 / $10,000</div>
+        </div>
+      </div>
 
-<div class="track">
-  <div class="lane" data-name="Sheila Schnellenberger">
-    <div class="name">Sheila Schnellenberger</div>
-    <div class="avatar"><img src="img/sheila.PNG" alt="Sheila"></div>
-    <div class="progress-text">$0 / $10,000</div>
+      <div class="lane" data-name="Chris Kelley">
+        <div class="name">Chris Kelley</div>
+        <div class="track-area">
+          <div class="start-line"></div>
+          <div class="avatar" style="left:10px;">
+            <img src="img/chris.PNG" alt="Chris headshot">
+          </div>
+          <div class="progress">$0 / $10,000</div>
+        </div>
+      </div>
+
+      <div class="lane" data-name="Tony Drew">
+        <div class="name">Tony Drew</div>
+        <div class="track-area">
+          <div class="start-line"></div>
+          <div class="avatar" style="left:10px;">
+            <img src="img/tony.PNG" alt="Tony headshot">
+          </div>
+          <div class="progress">$0 / $10,000</div>
+        </div>
+      </div>
+
+      <div class="lane" data-name="John Drake">
+        <div class="name">John Drake</div>
+        <div class="track-area">
+          <div class="start-line"></div>
+          <div class="avatar" style="left:10px;">
+            <img src="img/john.PNG" alt="John headshot">
+          </div>
+          <div class="progress">$0 / $10,000</div>
+        </div>
+      </div>
+
+      <div class="lane" data-name="Sami Nassar">
+        <div class="name">Sami Nassar</div>
+        <div class="track-area">
+          <div class="start-line"></div>
+          <div class="avatar" style="left:10px;">
+            <img src="img/sami.PNG" alt="Sami headshot">
+          </div>
+          <div class="progress">$0 / $10,000</div>
+        </div>
+      </div>
+
+      <div class="lane" data-name="Travis Lawrence">
+        <div class="name">Travis Lawrence</div>
+        <div class="track-area">
+          <div class="start-line"></div>
+          <div class="avatar" style="left:10px;">
+            <img src="img/travis.PNG" alt="Travis headshot">
+          </div>
+          <div class="progress">$0 / $10,000</div>
+        </div>
+      </div>
+
+      <div class="lane" data-name="Charles DSouza">
+        <div class="name">Charles DSouza</div>
+        <div class="track-area">
+          <div class="start-line"></div>
+          <div class="avatar" style="left:10px;">
+            <img src="img/charles.PNG" alt="Charles headshot">
+          </div>
+          <div class="progress">$0 / $10,000</div>
+        </div>
+      </div>
+
+      <div class="lane" data-name="Dan McDevitt">
+        <div class="name">Dan McDevitt</div>
+        <div class="track-area">
+          <div class="start-line"></div>
+          <div class="avatar" style="left:10px;">
+            <img src="img/dan.PNG" alt="Dan headshot">
+          </div>
+          <div class="progress">$0 / $10,000</div>
+        </div>
+      </div>
+
+      <div class="lane" data-name="Scott Boher">
+        <div class="name">Scott Boher</div>
+        <div class="track-area">
+          <div class="start-line"></div>
+          <div class="avatar" style="left:10px;">
+            <img src="img/scott.PNG" alt="Scott headshot">
+          </div>
+          <div class="progress">$0 / $10,000</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+HD Supply Charitable Fund, Inc
+A 501(c)(3) Public Charity
+EIN 42-1745656
+    </footer>
   </div>
 
-  <div class="lane" data-name="Chris Kelley">
-    <div class="name">Chris Kelley</div>
-    <div class="avatar"><img src="img/chris.PNG" alt="Chris"></div>
-    <div class="progress-text">$0 / $10,000</div>
-  </div>
-
-  <div class="lane" data-name="Tony Drew">
-    <div class="name">Tony Drew</div>
-    <div class="avatar"><img src="img/tony.PNG" alt="Tony"></div>
-    <div class="progress-text">$0 / $10,000</div>
-  </div>
-
-  <div class="lane" data-name="John Drake">
-    <div class="name">John Drake</div>
-    <div class="avatar"><img src="img/john.PNG" alt="John"></div>
-    <div class="progress-text">$0 / $10,000</div>
-  </div>
-
-  <div class="lane" data-name="Sami Nassar">
-    <div class="name">Sami Nassar</div>
-    <div class="avatar"><img src="img/sami.PNG" alt="Sami"></div>
-    <div class="progress-text">$0 / $10,000</div>
-  </div>
-
-  <div class="lane" data-name="Travis Lawrence">
-    <div class="name">Travis Lawrence</div>
-    <div class="avatar"><img src="img/travis.PNG" alt="Travis"></div>
-    <div class="progress-text">$0 / $10,000</div>
-  </div>
-
-  <div class="lane" data-name="Charles DSouza">
-    <div class="name">Charles DSouza</div>
-    <div class="avatar"><img src="img/charles.PNG" alt="Charles"></div>
-    <div class="progress-text">$0 / $10,000</div>
-  </div>
-
-  <div class="lane" data-name="Dan McDevitt">
-    <div class="name">Dan McDevitt</div>
-    <div class="avatar"><img src="img/dan.PNG" alt="Dan"></div>
-    <div class="progress-text">$0 / $10,000</div>
-  </div>
-
-  <div class="lane" data-name="Scott Boher">
-    <div class="name">Scott Boher</div>
-    <div class="avatar"><img src="img/scott.PNG" alt="Scott"></div>
-    <div class="progress-text">$0 / $10,000</div>
-  </div>
-</div>
-
-<footer>
-  HD Supply Charitable Fund, Inc<br>
-  A 501(c)(3) Public Charity<br>
-  EIN 42-1745656
-</footer>
-
-<!-- Live data from CSV (robust parser + ranking + movement) -->
 <script>
+/* Live data from CSV (robust-ish) + ranking + avatar movement */
 (async function () {
   const CSV_URL = "https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
-  const withBust = CSV_URL + "?t=" + Date.now();
+  const withBust = CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
 
-  function parseCSV(text) {
+  function parseCSV(text){
     const lines = text.trim().split(/\r?\n/);
     if (!lines.length) return [];
-    const headers = lines.shift().split(',').map(h => h.trim());
-    return lines.map(line => {
-      const cells = line.split(',').map(c => c.trim());
+    const headers = lines.shift().split(',').map(h=>h.trim());
+    return lines.map(line=>{
+      const cells = line.split(',').map(c=>c.trim());
       const row = {};
-      headers.forEach((h, i) => row[h] = cells[i] || '');
+      headers.forEach((h,i)=>row[h]=cells[i]||'');
       return row;
     });
   }
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const fmt = n => Number(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
 
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const fmt = n => Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
-
-  try {
-    const resp = await fetch(withBust, { cache: 'no-store' });
+  try{
+    const resp = await fetch(withBust,{cache:'no-store'});
     const csv = await resp.text();
     const rows = parseCSV(csv);
-    const map = new Map(rows.map(r => [r.Name, r]));
+    const map = new Map(rows.map(r=>[r.Name, r]));
+
     const lanes = Array.from(document.querySelectorAll('.lane[data-name]'));
-    const info = [];
-
-    lanes.forEach(lane => {
+    const info = lanes.map(lane=>{
       const name = lane.getAttribute('data-name');
-      const data = map.get(name) || {};
-      const raised = Number(data.Raised || 0);
-      const goal = Number(data.Goal || 10000);
-      info.push({ lane, name, raised, goal });
+      const d = map.get(name) || {};
+      const raised = Number((d.Raised||'0').toString().replace(/,/g,''));
+      const goal   = Number((d.Goal  ||'10000').toString().replace(/,/g,''));
+      return { lane, name, raised, goal };
     });
 
-    info.sort((a, b) => b.raised - a.raised);
-    const container = document.querySelector('.track');
+    // Rank by raised desc
+    info.sort((a,b)=>b.raised - a.raised);
 
-    info.forEach(({ lane, raised, goal }) => {
-      const pct = clamp(goal > 0 ? (raised / goal) * 100 : 0, 0, 100);
+    const board = document.getElementById('leaderboard');
+    info.forEach(({lane, raised, goal})=>{
+      const pct = clamp(goal>0 ? (raised/goal)*100 : 0, 0, 100);
       const avatar = lane.querySelector('.avatar');
-      if (avatar) avatar.style.left = `calc(${pct.toFixed(2)}% - 35px)`;
-      const label = lane.querySelector('.progress-text');
+      if (avatar) avatar.style.left = `calc(${pct.toFixed(2)}% - 36px)`; // center head on pct
+      const label = lane.querySelector('.progress');
       if (label) label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
-      container.appendChild(lane);
+      board.appendChild(lane); // re-order lanes visually
     });
-  } catch (err) {
-    console.error('Failed to load sheet:', err);
+  }catch(err){
+    console.error('Failed to load CSV:', err);
   }
 })();
 </script>
-
 </body>
 </html>
