@@ -65,12 +65,15 @@
   }
 
   /* Track area where the avatar moves */
-  .track-area{
-    position:relative;
-    height:calc(var(--lane-h) - 24px);
-    border-radius:10px;
-    background:#fff;
-  }
+.track-area {
+  position: relative;
+  height: calc(var(--lane-h) - 24px);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
   .start-line{
     position:absolute; left:8px; top:0; bottom:0;
     width:5px; background:var(--brand);
@@ -228,7 +231,6 @@ EIN 42-1745656
   </div>
 
 <script>
-/* Live data from CSV (robust-ish) + ranking + avatar movement */
 (async function () {
   const CSV_URL = "https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
   const withBust = CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
@@ -257,22 +259,32 @@ EIN 42-1745656
     const info = lanes.map(lane=>{
       const name = lane.getAttribute('data-name');
       const d = map.get(name) || {};
-      const raised = Number((d.Raised||'0').toString().replace(/,/g,''));
-      const goal   = Number((d.Goal  ||'10000').toString().replace(/,/g,''));
+      const raised = Number((d.Raised||'0').replace(/,/g,''));
+      const goal   = Number((d.Goal  ||'10000').replace(/,/g,''));
       return { lane, name, raised, goal };
     });
 
-    // Rank by raised desc
+    // Sort by raised descending
     info.sort((a,b)=>b.raised - a.raised);
-
     const board = document.getElementById('leaderboard');
+
     info.forEach(({lane, raised, goal})=>{
       const pct = clamp(goal>0 ? (raised/goal)*100 : 0, 0, 100);
+
+      // Avatar range only inside the track area (between name and amount)
+      const track = lane.querySelector('.track-area');
       const avatar = lane.querySelector('.avatar');
-      if (avatar) avatar.style.left = `calc(${pct.toFixed(2)}% - 36px)`; // center head on pct
       const label = lane.querySelector('.progress');
+
+      const trackWidth = track.offsetWidth;
+      const labelWidth = label.offsetWidth;
+      const startOffset = 10; // after the yellow line
+      const endOffset = trackWidth - labelWidth - 70; // before amount box
+      const moveX = startOffset + (pct/100) * (endOffset - startOffset);
+
+      if (avatar) avatar.style.left = `${moveX}px`;
       if (label) label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
-      board.appendChild(lane); // re-order lanes visually
+      board.appendChild(lane);
     });
   }catch(err){
     console.error('Failed to load CSV:', err);
