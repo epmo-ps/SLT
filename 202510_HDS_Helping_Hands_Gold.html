@@ -46,34 +46,35 @@
   border-radius: 3px;
 }
 
-/* Avatar and headshot size */
+/* Avatar container */
 .avatar {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  height: calc(var(--lane-h) - 20px);
   transition: left 0.6s ease;
-  z-index: 5;
+  z-index: 10;                /* floats above the lanes */
   pointer-events: none;
 }
 
+/* Headshots (scaled + animated) */
 .avatar img {
-  width: 45px;                  /* smaller faces */
-  height: 45px;
-  border-radius: 10px;
-  border: 2px solid var(--brand);
+  width: 65px;                /* slightly larger */
+  height: 65px;
+  border-radius: 50%;
+  border: 3px solid var(--brand);
   background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   object-fit: cover;
-  position: relative;
-  top: -2px;
   animation: bob 2s ease-in-out infinite;
+  will-change: transform;
 }
-/* 1) Bobbing animation (safe for users who prefer reduced motion) */
+
+/* Bobbing animation */
 @keyframes bob {
   0%, 100% { transform: translateY(-50%); }
-  50%      { transform: translateY(calc(-50% - 2px)); } /* tiny lift */
+  50% { transform: translateY(calc(-50% - 4px)); }
 }
+
 @media (prefers-reduced-motion: reduce) {
   .avatar img { animation: none !important; }
 }
