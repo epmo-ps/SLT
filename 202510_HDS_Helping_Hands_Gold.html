@@ -261,7 +261,7 @@ footer .org-info a:hover{text-decoration:underline;}
   document.addEventListener('visibilitychange',()=>!document.hidden && update());
 })();
 
-/* CSV → auto-rank → layout; timestamp; Tony confetti; intro race */
+/* CSV → auto-rank → layout; timestamp only on change; Tony confetti; intro race */
 (function () {
   const CSV_URL="https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
   const bust=url=>url+(url.includes("?")?"&":"?")+"t="+Date.now();
@@ -272,6 +272,7 @@ footer .org-info a:hover{text-decoration:underline;}
   let didIntro=false;
   let prevTonyRaised=0;
   let introQueued=false;
+  let lastCsvText="";  // <-- NEW: cache previous CSV text
 
   function parseCSV(text){
     const lines=text.trim().split(/\r?\n/);
@@ -290,12 +291,6 @@ footer .org-info a:hover{text-decoration:underline;}
     const datePart = now.toLocaleDateString([], {month:'short', day:'2-digit'});
     const timePart = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     el.textContent = `Updated ${datePart}, ${timePart}`;
-  }
-
-  async function fetchRows(){
-    const resp=await fetch(bust(CSV_URL),{cache:'no-store'});
-    const text=await resp.text();
-    return parseCSV(text);
   }
 
   function mapLanes(rows){
@@ -403,35 +398,26 @@ footer .org-info a:hover{text-decoration:underline;}
       if(Date.now()<end) requestAnimationFrame(frame);
     })();
   }
-let lastCsvText = ""; // cache of previous CSV
 
-async function loadAndRender(){
-  try{
-    const resp = await fetch(bust(CSV_URL), {cache:'no-store'});
-    const text = await resp.text();
+  async function loadAndRender(){
+    try{
+      // Fetch raw CSV text with cache-bust
+      const resp = await fetch(bust(CSV_URL), {cache:'no-store'});
+      const text = await resp.text();
 
-    // only proceed if data actually changed
-    if (text !== lastCsvText) {
-      lastCsvText = text;
-      const rows = parseCSV(text);
-      mapLanes(rows);
-      rankLanes();
-      layout();
-      setTimestamp(); // <-- update only on change
-      console.log("Data changed — layout + timestamp refreshed");
-    } else {
-      console.log("No change — skipped timestamp update");
-    }
+      // Only re-render + update timestamp if data actually changed
+      if (text !== lastCsvText) {
+        lastCsvText = text;
+        const rows = parseCSV(text);
+        mapLanes(rows);
+        rankLanes();
+        layout();
+        setTimestamp(); // <-- timestamp updates only on change
+        console.log("Data changed — layout + timestamp refreshed");
+      } else {
+        console.log("No change — skipped timestamp update");
+      }
 
-    // Fallback: if no user interaction, still show the intro race once
-    if(!introQueued){
-      introQueued=true;
-      setTimeout(()=>{ if(!didIntro) raceIntro(); }, 1500);
-    }
-  } catch(e){
-    console.error('Failed to load CSV:', e);
-  }
-}
       // Fallback: if no user interaction, still show the intro race once
       if(!introQueued){
         introQueued=true;
