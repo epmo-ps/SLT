@@ -403,15 +403,35 @@ footer .org-info a:hover{text-decoration:underline;}
       if(Date.now()<end) requestAnimationFrame(frame);
     })();
   }
+let lastCsvText = ""; // cache of previous CSV
 
-  async function loadAndRender(){
-    try{
-      const rows=await fetchRows();
+async function loadAndRender(){
+  try{
+    const resp = await fetch(bust(CSV_URL), {cache:'no-store'});
+    const text = await resp.text();
+
+    // only proceed if data actually changed
+    if (text !== lastCsvText) {
+      lastCsvText = text;
+      const rows = parseCSV(text);
       mapLanes(rows);
       rankLanes();
       layout();
-      setTimestamp();
+      setTimestamp(); // <-- update only on change
+      console.log("Data changed — layout + timestamp refreshed");
+    } else {
+      console.log("No change — skipped timestamp update");
+    }
 
+    // Fallback: if no user interaction, still show the intro race once
+    if(!introQueued){
+      introQueued=true;
+      setTimeout(()=>{ if(!didIntro) raceIntro(); }, 1500);
+    }
+  } catch(e){
+    console.error('Failed to load CSV:', e);
+  }
+}
       // Fallback: if no user interaction, still show the intro race once
       if(!introQueued){
         introQueued=true;
