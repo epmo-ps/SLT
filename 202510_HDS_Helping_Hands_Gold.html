@@ -56,7 +56,7 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   background:#fff;
   overflow:visible;
   display:flex;align-items:center;
-  padding-right:112px;         /* reserve space so the progress badge never crowds */
+  padding-right:112px;         /* desktop reserve for the progress badge */
 }
 .start-line{
   position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand);border-radius:2px;
@@ -92,33 +92,35 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   .avatar img{ animation:none !important; }
 }
 
-/* Progress badge anchored at far right; compact on tiny screens */
+/* Progress badge fixed at far right; never abbreviate, never ellipsize */
 .progress{
   position:absolute;right:8px;bottom:8px;background:#fff;border:1px solid var(--border);
-  padding:4px 10px;border-radius:10px;font-size:13.5px;font-weight:600;color:#222;white-space:nowrap;
-  max-width:46%;
-  text-overflow:ellipsis;overflow:hidden;
+  padding:4px 10px;border-radius:10px;font-size:13.5px;font-weight:600;color:#222;
+  white-space:nowrap;               /* keep it on one line */
+  /* removed max-width & overflow rules that caused truncation */
 }
 
-/* Responsive tweaks for names column, lane height, and badge sizing */
+/* Responsive tweaks
+   - Wider name column around tablet sizes
+   - On phones: reserve EXTRA right-side gutter so the badge fits fully */
 @media (max-width:900px){
-  :root{ --name-col:130px; }   /* a bit roomier for mid screens */
+  :root{ --name-col:130px; }
 }
 @media (max-width:640px){
   :root{ --name-col:110px; --lane-h:132px; }
   .board{padding:10px}
   .progress{ font-size:12.5px; padding:3px 8px; }
-  .track-area{ padding-right:96px; }
+  .track-area{ padding-right:160px; } /* was 96px → reserve more for full amount */
 }
 @media (max-width:420px){
   :root{ --name-col:96px; --lane-h:128px; }
   .progress{ font-size:12px; padding:3px 8px; }
-  .track-area{ padding-right:88px; }
+  .track-area{ padding-right:168px; } /* extra gutter for narrow phones */
 }
 @media (max-width:360px){
   :root{ --name-col:88px; --lane-h:124px; }
   .progress{ font-size:11.5px; padding:3px 7px; right:6px; bottom:6px; }
-  .track-area{ padding-right:80px; }
+  .track-area{ padding-right:176px; } /* tightest screens get the biggest reserve */
 }
 
 footer{margin-top:16px;text-align:center;color:#444;font-size:13px;line-height:1.35;white-space:pre-line;}
