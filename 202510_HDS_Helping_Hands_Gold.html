@@ -243,6 +243,15 @@ footer .org-info a:hover{text-decoration:underline;}
         <a href="https://hdsupply.com" target="_blank" rel="noopener">Visit HD Supply</a>
       </div>
     </footer>
+    <p style="
+  text-align:center;
+  color:#777;
+  font-size:12.5px;
+  font-style:italic;
+  margin-top:18px;
+  letter-spacing:0.3px;">
+  powered by <strong>EPMO</strong> – Next Generation Project Management
+</p>
   </div>
 
 <script>
@@ -261,18 +270,20 @@ footer .org-info a:hover{text-decoration:underline;}
   document.addEventListener('visibilitychange',()=>!document.hidden && update());
 })();
 
-/* CSV → auto-rank → layout; timestamp only on change; Tony confetti; intro race */
+/* CSV + GitHub commits API → auto-rank; timestamp set to LAST COMMIT time; confetti; intro race */
 (function () {
-  const CSV_URL="https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
+  const RAW_CSV_URL="https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
+  const COMMITS_API="https://api.github.com/repos/epmo-ps/SLT/commits?path=slt.csv&per_page=1";
   const bust=url=>url+(url.includes("?")?"&":"?")+"t="+Date.now();
 
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const fmt=n=>Number(String(n||0).replace(/,/g,'')||0).toLocaleString('en-US',{maximumFractionDigits:0});
+
   let laneData=[];
   let didIntro=false;
   let prevTonyRaised=0;
   let introQueued=false;
-  let lastCsvText="";  // <-- NEW: cache previous CSV text
+  let lastCommitSha="";  // <-- compare SHA, not just text
 
   function parseCSV(text){
     const lines=text.trim().split(/\r?\n/);
@@ -285,11 +296,11 @@ footer .org-info a:hover{text-decoration:underline;}
     });
   }
 
-  function setTimestamp(){
+  function setTimestampFromISO(iso){
     const el=document.getElementById('lastUpdated'); if(!el) return;
-    const now=new Date();
-    const datePart = now.toLocaleDateString([], {month:'short', day:'2-digit'});
-    const timePart = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const d=new Date(iso);
+    const datePart = d.toLocaleDateString([], {month:'short', day:'2-digit'});
+    const timePart = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     el.textContent = `Updated ${datePart}, ${timePart}`;
   }
 
@@ -401,36 +412,72 @@ footer .org-info a:hover{text-decoration:underline;}
 
   async function loadAndRender(){
     try{
-      // Fetch raw CSV text with cache-bust
-      const resp = await fetch(bust(CSV_URL), {cache:'no-store'});
-      const text = await resp.text();
+      // 1) Hit GitHub Commits API for latest commit to slt.csv
+      const commitsResp = await fetch(COMMITS_API, {cache:'no-store'});
+      if(!commitsResp.ok) throw new Error("GitHub commits API error: " + commitsResp.status);
+      const commits = await commitsResp.json();
+      const latest = Array.isArray(commits) && commits[0];
+      if(!latest) return;
 
-      // Only re-render + update timestamp if data actually changed
-      if (text !== lastCsvText) {
-        lastCsvText = text;
-        const rows = parseCSV(text);
+      const sha = latest.sha;
+      const commitISO = (latest.commit && (latest.commit.committer?.date || latest.commit.author?.date)) || null;
+
+      // 2) Only proceed if SHA changed
+      if(sha !== lastCommitSha){
+        lastCommitSha = sha;
+
+        // fetch CSV only when commit changed
+        const csvResp = await fetch(bust(RAW_CSV_URL), {cache:'no-store'});
+        const csvText = await csvResp.text();
+        const rows = parseCSV(csvText);
+
         mapLanes(rows);
         rankLanes();
         layout();
-        setTimestamp(); // <-- timestamp updates only on change
-        console.log("Data changed — layout + timestamp refreshed");
+
+        if(commitISO) setTimestampFromISO(commitISO);
+        else setTimestampFromISO(new Date().toISOString());
+
+        // ensure intro race happens at least once per page load
+        if(!introQueued){
+          introQueued=true;
+          setTimeout(()=>{ if(!didIntro) raceIntro(); }, 500);
+        }
+
+        console.log("Commit changed — layout + timestamp updated to last commit time");
       } else {
-        console.log("No change — skipped timestamp update");
+        // no change: do nothing (saves requests and keeps timestamp stable)
+        console.log("No new commit — skipped CSV fetch and timestamp update");
       }
 
-      // Fallback: if no user interaction, still show the intro race once
+      // Fallback: if user never interacts, still show the intro race once after first check
       if(!introQueued){
         introQueued=true;
         setTimeout(()=>{ if(!didIntro) raceIntro(); }, 1500);
       }
     }catch(e){
-      console.error('Failed to load CSV:', e);
+      console.error('Update flow failed; falling back to CSV check only:', e);
+      // Fallback: if the commits API hits a rate limit or error, do a CSV check so the page still works
+      try{
+        const csvResp = await fetch(bust(RAW_CSV_URL), {cache:'no-store'});
+        const csvText = await csvResp.text();
+        const rows = parseCSV(csvText);
+        mapLanes(rows);
+        rankLanes();
+        layout();
+        // Do NOT touch timestamp here—since we couldn't verify commit time
+      }catch(err){
+        console.error('CSV fallback also failed:', err);
+      }
     }
   }
 
   loadAndRender();
   window.addEventListener('resize', layout);
-  setInterval(loadAndRender, 60*1000);
+
+  // Poll every 90s to stay within unauthenticated GitHub rate limits with buffer.
+  setInterval(loadAndRender, 90*1000);
+
   document.addEventListener('visibilitychange',()=>!document.hidden && loadAndRender());
 })();
 </script>
