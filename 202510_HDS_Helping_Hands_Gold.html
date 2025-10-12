@@ -8,15 +8,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
-  :root{
-    --brand:#FFC907;
-    --bg:#f7f7f7;
-    --card:#ffffff;
-    --border:#e8e8e8;
-    --name-col:200px;
-    --lane-h:92px;
-    --maxw:980px;
-  }
+:root{
+  --brand:#FFC907;
+  --bg:#f7f7f7;
+  --card:#ffffff;
+  --border:#e8e8e8;
+  --name-col:170px;
+  --lane-h:92px;
+  --maxw:980px;
+}
   *{box-sizing:border-box}
   body{margin:0;padding:18px 12px 36px;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:#111;}
   .wrap{max-width:var(--maxw);margin:0 auto;}
@@ -36,8 +36,15 @@
   .name{font-family:Oswald,system-ui;font-size:clamp(16px,3.4vw,20px);padding-left:4px;word-break:break-word;}
 
   .track-area{position:relative;height:calc(var(--lane-h) - 14px);border-radius:10px;background:#fff;overflow:hidden;display:flex;align-items:left;}
-  .start-line{position:absolute;left:5px;top:0;bottom:0;width:4px;background:var(--brand);border-radius:3px;}
-
+.start-line{
+  position:absolute;
+  left:-4px;  /* moves line closer to names */
+  top:0;
+  bottom:0;
+  width:4px;
+  background:var(--brand);
+  border-radius:3px;
+}
   .avatar{position:absolute;top:50%;transform:translateY(-50%);left:10px;height:calc(var(--lane-h) - 14px);transition:left .6s ease;}
   .avatar img{height:100%;width:auto;border-radius:10px;background:#fff;border:2px solid var(--brand);box-shadow:0 1px 2px rgba(0,0,0,.08);}
 
