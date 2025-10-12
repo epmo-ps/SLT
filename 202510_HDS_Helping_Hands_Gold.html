@@ -13,10 +13,10 @@
   --bg:#f7f7f7;
   --card:#ffffff;
   --border:#e8e8e8;
-  --name-col:120px;        /* desktop default */
-  --lane-h:148px;          /* more vertical space */
-  --avatar-size:120px;     /* headshot height */
-  --avatar-lift:24px;      /* drop headshots lower in the lane */
+  --name-col:120px;
+  --lane-h:148px;
+  --avatar-size:110px;
+  --avatar-lift:24px;          /* lower headshots */
   --maxw:980px;
 }
 *{box-sizing:border-box}
@@ -37,7 +37,7 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
 .lane{
   display:grid;
   grid-template-columns:var(--name-col) 1fr;
-  column-gap:0;               /* ⬅ closer: no space between name col and track */
+  column-gap:0;                 /* tight to names */
   align-items:center;
   background:#fff;
   border:2px dotted var(--brand);
@@ -45,14 +45,9 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   padding:10px;
   min-height:var(--lane-h);
   margin:8px 0;
-  overflow:visible;            /* allow avatars to float above border */
+  overflow:visible;
 }
-.name{
-  font-family:Oswald,system-ui;
-  font-size:clamp(16px,3.4vw,20px);
-  padding:0 8px 0 4px;        /* tiny breathing room without re-adding a gap */
-  word-break:break-word;
-}
+.name{font-family:Oswald,system-ui;font-size:clamp(16px,3.4vw,20px);padding:0 8px 0 4px;word-break:break-word;}
 
 .track-area{
   position:relative;
@@ -61,64 +56,55 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   background:#fff;
   overflow:visible;
   display:flex;align-items:center;
-  /* IMPORTANT: no extra right padding so avatars get full travel room on mobile */
 }
 .start-line{
-  position:absolute;
-  left:-10px;                  /* ⬅ nudge the line into the name column */
-  top:0;bottom:0;
-  width:3px;background:var(--brand);border-radius:2px;
+  position:absolute;left:-8px;top:0;bottom:0;width:3px;background:var(--brand);border-radius:2px;
 }
 
-/* Avatars “run” on the track, above borders */
+/* Rank badges */
+.rank-badge{
+  position:absolute;top:8px;left:8px;z-index:25;
+  display:flex;align-items:center;gap:6px;
+  padding:2px 10px;border-radius:999px;background:#fff;border:2px solid #e6e6e6;
+  box-shadow:0 1px 2px rgba(0,0,0,.08);white-space:nowrap;font-weight:700;font-size:13px;color:#222;
+}
+.rank-badge .icon{font-size:15px;line-height:1}
+.rank-badge.winner{ border-color:#e3b300; }   /* highlight only the winner */
+
+/* Avatars */
 .avatar{
-  position:absolute;
-  z-index:20;
-  top:calc(50% + var(--avatar-lift));  /* lower the avatar */
-  transform:translateY(-50%);          /* keep bob centered around new baseline */
+  position:absolute;z-index:20;
+  top:calc(50% + var(--avatar-lift));
+  transform:translateY(-50%);
   transition:left .6s ease, top .6s ease;
   pointer-events:none;
 }
 .avatar img{
-  height:var(--avatar-size);
-  width:auto;                       /* keep proportions */
-  border-radius:12px;
-  border:3px solid var(--brand);
-  background:#fff;
-  box-shadow:0 4px 10px rgba(0,0,0,.25);
-  object-fit:cover;
-  animation:bob 2.2s ease-in-out infinite;
-  will-change:transform;
+  height:var(--avatar-size);width:auto;border-radius:12px;border:3px solid var(--brand);
+  background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.25);object-fit:cover;
+  animation:bob 2.2s ease-in-out infinite;will-change:transform;
 }
+@keyframes bob{0%,100%{transform:translateY(-50%)}50%{transform:translateY(calc(-50% - 4px))}}
+@media (prefers-reduced-motion: reduce){.avatar img{animation:none !important}}
 
-/* Gentle running bob */
-@keyframes bob{
-  0%,100%{ transform:translateY(-50%); }
-  50%    { transform:translateY(calc(-50% - 4px)); }
-}
-@media (prefers-reduced-motion: reduce){
-  .avatar img{ animation:none !important; }
-}
-
-/* Progress badge fixed at far right; full text (no ellipsis) */
+/* Progress badge: full text, no ellipsis */
 .progress{
   position:absolute;right:8px;bottom:8px;background:#fff;border:1px solid var(--border);
-  padding:4px 10px;border-radius:10px;font-size:13.5px;font-weight:600;color:#222;
-  white-space:nowrap;
+  padding:4px 10px;border-radius:10px;font-size:13.5px;font-weight:600;color:#222;white-space:nowrap;
 }
 
-/* Responsive tweaks */
-@media (max-width:900px){
-  :root{ --name-col:130px; }
-}
+/* Responsive */
+@media (max-width:900px){ :root{ --name-col:130px; } }
 @media (max-width:640px){
   :root{ --name-col:110px; --lane-h:132px; }
   .board{padding:10px}
   .progress{ font-size:12.5px; padding:3px 8px; }
+  .rank-badge{ top:6px; left:6px; font-size:12px; padding:2px 8px; }
 }
 @media (max-width:420px){
   :root{ --name-col:96px; --lane-h:128px; }
   .progress{ font-size:12px; padding:3px 8px; }
+  .rank-badge{ font-size:11.5px; }
 }
 @media (max-width:360px){
   :root{ --name-col:88px; --lane-h:124px; }
@@ -134,8 +120,7 @@ footer{margin-top:16px;text-align:center;color:#444;font-size:13px;line-height:1
       <h1>Tony Drew for the Gold! 🏆</h1>
       <p class="lead">The SLT are off to the races! 🏁</p>
       <p class="lead">👉 <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank"><strong>Donate Here</strong></a>
-        to <strong>HD Supply Helping Hand</strong> 
-        </p>
+        to support <strong>HD Supply Helping Hand</strong> and help our favorite racer cross the finish line! 💛</p>
     </header>
 
     <!-- Campaign timeline -->
@@ -145,7 +130,7 @@ footer{margin-top:16px;text-align:center;color:#444;font-size:13px;line-height:1
     </div>
 
     <section class="board" id="leaderboard">
-      <!-- First names shown; full names in data-name to match CSV -->
+      <!-- Lanes (names shown; full in data-name) -->
       <div class="lane" data-name="Sheila Schnellenberger">
         <div class="name">Sheila</div>
         <div class="track-area">
@@ -241,7 +226,6 @@ EIN 42-1745656
   const start=new Date("2025-10-01T00:00:00");
   const end=new Date("2025-10-31T23:59:59");
   const fill=document.getElementById('campaignFill');
-
   function updateFill(){
     const now=new Date();
     let pct=0;
@@ -251,17 +235,14 @@ EIN 42-1745656
     if(fill) fill.style.width=pct.toFixed(1)+"%";
   }
   updateFill();
-  /* Update the bar hourly and on visibility change */
   setInterval(updateFill, 60*60*1000);
   document.addEventListener('visibilitychange',()=>!document.hidden && updateFill());
 })();
 
-/* CSV → rank lanes → move avatars (centered) between start line & amount badge
-   + Auto-refresh every 60 seconds without page reload */
+/* CSV → rank lanes → badges → move avatars; refresh every 60s */
 (function () {
   const CSV_URL="https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
-
-  function bust(url){ return url+(url.includes("?")?"&":"?")+"t="+Date.now(); }
+  const bust=url=>url+(url.includes("?")?"&":"?")+"t="+Date.now();
 
   function parseCSV(text){
     const lines=text.trim().split(/\r?\n/);
@@ -302,6 +283,30 @@ EIN 42-1745656
     laneData.forEach(({lane})=>board.appendChild(lane));
   }
 
+  /* Build badges: Winner for rank 1, numeric rank for the rest */
+  function ordinal(n){
+    const s=["th","st","nd","rd"], v=n%100;
+    return n+(s[(v-20)%10]||s[v]||s[0]);
+  }
+  function applyRankBadges(){
+    document.querySelectorAll('.rank-badge').forEach(n=>n.remove());
+    laneData.forEach(({lane}, i)=>{
+      const ta = lane.querySelector('.track-area'); if(!ta) return;
+      const badge = document.createElement('div');
+      const rank = i+1;
+      if(rank===1){
+        badge.className = 'rank-badge winner';
+        badge.innerHTML = `<span class="icon">🏆</span><span>Winner</span>`;
+        badge.setAttribute('aria-label','Current leader: Winner');
+      }else{
+        badge.className = 'rank-badge';
+        badge.textContent = `${ordinal(rank)} place`;
+        badge.setAttribute('aria-label',`Rank ${rank}`);
+      }
+      ta.appendChild(badge);
+    });
+  }
+
   function layout(){
     laneData.forEach(({lane, raised, goal})=>{
       const track=lane.querySelector('.track-area');
@@ -315,22 +320,18 @@ EIN 42-1745656
       // geometry
       const trackRect = track.getBoundingClientRect();
       const lineRect  = startLine.getBoundingClientRect();
-
-      // start a hair after the yellow line
       const startX = Math.max(0, lineRect.right - trackRect.left) + 2;
 
       const trackW  = track.clientWidth;
       const labelW  = label.offsetWidth;
       const avatarW = avatar.getBoundingClientRect().width || 72;
 
-      // compute travel range using the AVATAR CENTER; avoid the badge
+      // center-based travel; avoid amount badge
       const minCenterX = startX + (avatarW/2);
       const maxCenterX = Math.max(minCenterX, trackW - labelW - 10 - (avatarW/2));
-
       const centerX = minCenterX + (pct/100) * (maxCenterX - minCenterX);
 
       avatar.style.left = (centerX - avatarW/2) + "px";
-
       label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
     });
   }
@@ -339,21 +340,17 @@ EIN 42-1745656
     try{
       const rows=await fetchRows();
       mapLanes(rows);
-      rankLanes();
-      layout();
+      rankLanes();          // reorder lanes
+      applyRankBadges();    // add Winner + ranks
+      layout();             // position avatars + labels
     }catch(e){
       console.error('Failed to load CSV:', e);
     }
   }
 
-  // Initial load
   loadAndRender();
-
-  // Re-layout after images load/resize
   window.addEventListener('load', layout);
   window.addEventListener('resize', layout);
-
-  // Auto-refresh data every 60 seconds; also when tab becomes visible again
   setInterval(loadAndRender, 60*1000);
   document.addEventListener('visibilitychange',()=>!document.hidden && loadAndRender());
 })();
