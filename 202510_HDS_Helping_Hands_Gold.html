@@ -221,22 +221,24 @@ EIN 42-1745656
 
   function layout(){
     laneData.forEach(({lane, raised, goal})=>{
-      const track=lane.querySelector('.track-area');
-      const startLine=lane.querySelector('.start-line');
-      const label=lane.querySelector('.progress');
-      const avatar=lane.querySelector('.avatar');
-      if(!track||!label||!avatar) return;
+// Compute travel range inside the track: from just after the yellow line to just before the amount badge
+const trackRect = track.getBoundingClientRect();
+const lineRect  = startLine.getBoundingClientRect();
 
-      const pct=clamp(goal>0 ? (raised/goal)*100 : 0, 0, 100);
+// distance from track's left edge to the far edge of the start line
+const startX = Math.max(0, lineRect.right - trackRect.left) + 6;  // +6px breathing room
 
-      const startX=(startLine?.offsetLeft||0)+(startLine?.offsetWidth||0)+6;
-      const trackW=track.clientWidth;
-      const labelW=label.offsetWidth;
-      const avatarW=avatar.getBoundingClientRect().width||72;
-      const endX=Math.max(startX, trackW - labelW - avatarW - 10);
+const trackW = track.clientWidth;
+const labelW = label.offsetWidth;
+const avatarW = avatar.getBoundingClientRect().width || 72;
 
-      const moveX = startX + (pct/100) * (endX - startX);
-      avatar.style.left = moveX + "px";
+// End just before the amount bubble
+const endX = Math.max(startX, trackW - labelW - avatarW - 10);
+
+const pct = clamp(goal > 0 ? (raised / goal) * 100 : 0, 0, 100);
+const moveX = startX + (pct / 100) * (endX - startX);
+
+avatar.style.left = moveX + 'px';
       label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
     });
   }
