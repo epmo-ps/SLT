@@ -45,21 +45,18 @@
   background: var(--brand);
   border-radius: 3px;
 }
-
-/* Avatar container */
 .avatar {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   transition: left 0.6s ease;
-  z-index: 10;                /* floats above the lanes */
+  z-index: 10;
   pointer-events: none;
 }
 
-/* Headshots (scaled + animated) */
 .avatar img {
-  width: 65px;                /* slightly larger */
-  height: 65px;
+  height: 100px;            
+  width: auto;             
   border-radius: 50%;
   border: 3px solid var(--brand);
   background: white;
