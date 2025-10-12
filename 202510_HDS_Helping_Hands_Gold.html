@@ -14,9 +14,9 @@
   --card:#ffffff;
   --border:#e8e8e8;
   --name-col:120px;
-  --lane-h:148px;
-  --avatar-size:110px;
-  --avatar-lift:24px;      /* drop headshots lower */
+  --lane-h:150px;
+  --avatar-size:110px;       /* headshot size */
+  --avatar-lift:26px;        /* drop headshots a bit */
   --maxw:980px;
 }
 *{box-sizing:border-box}
@@ -25,103 +25,97 @@ body{margin:0;padding:18px 12px 36px;font-family:Montserrat,system-ui,-apple-sys
 
 header{text-align:center;margin-bottom:12px;}
 header h1{font-family:Oswald,Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;font-size:clamp(26px,5vw,40px);margin:0 0 6px;}
-header .lead{margin:0 0 4px;font-size:clamp(14px,3.2vw,16px);}
-header .lead strong:last-child {
-  display:block;
-  margin-top:4px;
-  font-size:15px;
-  color:#222;
-  letter-spacing:0.2px;}
+header .lead{margin:0 0 6px;font-size:clamp(14px,3.2vw,16px);line-height:1.4;}
 header .nudge{font-size:13px;color:#666;margin-top:4px;font-style:italic;}
 
+/* CTA line: inline pointer, yellow text; only "Here" blue */
+header .cta-inline{
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  font-size:clamp(15px,3.4vw,18px);font-weight:700;color:var(--brand);
+}
+header .cta-inline a{
+  color:#0a58ca;text-decoration:none;border-bottom:1px dotted currentColor;
+}
+header .cta-inline a:hover{ text-decoration:underline; }
+
+/* Campaign progress */
 .campaign{margin:14px auto 8px;max-width:520px;}
 .campaign-bar{height:10px;border-radius:6px;background:#e1e1e1;overflow:hidden;}
 .campaign-fill{height:100%;width:0%;background:var(--brand);transition:width 1s ease;}
 .campaign-labels{display:flex;justify-content:space-between;font-size:12.5px;color:#555;margin-top:4px;padding:0 2px;}
 
+/* Audio block */
+.audio-wrap{max-width:520px;margin:10px auto 6px;text-align:center}
+#audioToggle{border:1px solid #d9c15a;background:#fff7cf;border-radius:999px;padding:6px 12px;font-weight:700;cursor:pointer}
+#audioToggle[aria-pressed="true"]{background:#ffef98}
+.audio-player{margin:10px 0;border-radius:12px;overflow:hidden}
+
+/* Lanes */
 .board{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
 .lane{
-  display:grid;
-  grid-template-columns:var(--name-col) 1fr;
-  column-gap:0;               /* start line tight to names */
-  align-items:center;
-  background:#fff;
-  border:2px dotted var(--brand);
-  border-radius:12px;
-  padding:10px;
-  min-height:var(--lane-h);
-  margin:8px 0;
-  overflow:visible;
+  display:grid; grid-template-columns:var(--name-col) 1fr; column-gap:0;
+  align-items:center; background:#fff; border:2px dotted var(--brand);
+  border-radius:12px; padding:10px; min-height:var(--lane-h); margin:8px 0; overflow:visible;
 }
 .name{font-family:Oswald,system-ui;font-size:clamp(16px,3.4vw,20px);padding:0 8px 0 4px;word-break:break-word;}
 
 .track-area{
-  position:relative;
-  height:calc(var(--lane-h) - 22px);
-  border-radius:10px;
-  /* Midpoint glow starts ~50% to motivate progress */
+  position:relative; height:calc(var(--lane-h) - 22px); border-radius:10px;
+  /* Midpoint glow to motivate progress */
   background: linear-gradient(to right, #fff 0%, #fff 45%, #fff4bf 70%, #fff4bf 100%);
-  overflow:visible;
-  display:flex;align-items:center;
+  overflow:visible; display:flex; align-items:center;
 }
 .start-line{
-  position:absolute;left:-8px;top:0;bottom:0;width:3px;background:var(--brand);border-radius:2px;
+  position:absolute; left:-8px; top:0; bottom:0; width:3px; background:var(--brand); border-radius:2px;
 }
-/* Finish line (dashed) */
 .finish-line{
-  position:absolute;right:0;top:0;bottom:0;width:3px;
-  background: repeating-linear-gradient(
-    to bottom,
-    var(--brand), var(--brand) 6px,
-    #ffffff 6px, #ffffff 12px
-  );
+  position:absolute; right:0; top:0; bottom:0; width:3px;
+  background:repeating-linear-gradient(to bottom, var(--brand), var(--brand) 6px, #ffffff 6px, #ffffff 12px);
   border-radius:2px;
 }
 
-/* Emphasize Tony’s lane dynamically (follows him even when ranking changes) */
+/* Tony emphasis (follows lane via data-name) */
 .lane[data-name="Tony Drew"] .track-area{
   background: linear-gradient(to right, #fff 0%, #fff 45%, #fff1a6 70%, #fff1a6 100%);
   box-shadow: inset 0 0 12px rgba(255,201,7,.4);
 }
-.lane[data-name="Tony Drew"] .name{
-  color:#d4a300;font-weight:700;
-}
+.lane[data-name="Tony Drew"] .name{ color:#d4a300; font-weight:700; }
 
 /* Avatars */
 .avatar{
-  position:absolute;z-index:20;
-  top:calc(50% + var(--avatar-lift));
-  transform:translateY(-50%);
-  /* smoother motion */
-  transition: left 1.5s cubic-bezier(.4,0,.2,1), top .6s ease;
-  pointer-events:none;
+  position:absolute; z-index:20; top:calc(50% + var(--avatar-lift)); transform:translateY(-50%);
+  transition:left 1.5s cubic-bezier(.4,0,.2,1), top .6s ease; pointer-events:none;
 }
 .avatar img{
-  height:var(--avatar-size);width:auto;border-radius:12px;border:3px solid var(--brand);
-  background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.25);object-fit:cover;
-  animation:bob 2.2s ease-in-out infinite;will-change:transform;
+  height:var(--avatar-size); width:auto; border-radius:12px; border:3px solid var(--brand);
+  background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.25); object-fit:cover;
+  animation:bob 2.2s ease-in-out infinite; will-change:transform;
 }
 @keyframes bob{0%,100%{transform:translateY(-50%)}50%{transform:translateY(calc(-50% - 4px))}}
 @media (prefers-reduced-motion: reduce){.avatar img{animation:none !important}}
 
-/* Progress badge: full text, no ellipsis */
+/* Progress badge */
 .progress{
-  position:absolute;right:8px;bottom:8px;background:#fff;border:1px solid var(--border);
-  padding:4px 10px;border-radius:10px;font-size:13.5px;font-weight:600;color:#222;white-space:nowrap;
+  position:absolute; right:8px; bottom:8px; background:#fff; border:1px solid var(--border);
+  padding:4px 10px; border-radius:10px; font-size:13.5px; font-weight:600; color:#222; white-space:nowrap;
 }
 
-/* CTA emoji that follows Tony's avatar */
+/* CTA emoji that follows Tony */
 .cta-emoji{
-  position:absolute;z-index:30;
-  top:calc(50% + var(--avatar-lift));
-  transform:translateY(-50%);
-  font-size:28px;line-height:1;text-decoration:none;
+  position:absolute; z-index:30; top:calc(50% + var(--avatar-lift)); transform:translateY(-50%);
+  font-size:28px; line-height:1; text-decoration:none;
   filter: drop-shadow(0 2px 3px rgba(0,0,0,.2));
   animation:bob 2.2s ease-in-out infinite;
 }
 .cta-emoji:focus{outline:2px solid #0a58ca;border-radius:6px}
 
-/* Responsive */
+/* Footer */
+footer{margin-top:20px;text-align:center;color:#444;font-size:13px;line-height:1.4;}
+footer small{display:block;margin-bottom:10px;font-size:12.5px;color:#666;letter-spacing:.2px;font-style:italic;}
+footer .org-info a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted currentColor;}
+footer .org-info a:hover{text-decoration:underline;}
+
+/* Responsive tweaks */
 @media (max-width:900px){ :root{ --name-col:130px; } }
 @media (max-width:640px){
   :root{ --name-col:110px; --lane-h:132px; }
@@ -136,25 +130,20 @@ header .nudge{font-size:13px;color:#666;margin-top:4px;font-style:italic;}
   :root{ --name-col:88px; --lane-h:124px; }
   .progress{ font-size:11.5px; padding:3px 7px; right:6px; bottom:6px; }
 }
-
-footer{
-  margin-top:20px;text-align:center;color:#444;font-size:13px;line-height:1.4;
-}
-footer small{
-  display:block;margin-bottom:10px;font-size:12.5px;color:#666;letter-spacing:.2px;font-style:italic;
-}
-footer .org-info a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted currentColor;}
-footer .org-info a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <h1>Tony Drew for the Gold! 🏆</h1>
+
+      <!-- CTA line with inline pointer, only 'Here' blue -->
       <p class="lead">
-        👉 <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank"><strong>Donate Here to Team Tony Drew</strong></a><br>
-        <strong>HD Supply Helping Hand</strong>
+        <span class="cta-inline">
+          👉 <span>Donate <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank" rel="noopener">Here</a> to Team Tony Drew</span>
+        </span>
       </p>
+      <p class="lead"><strong>HD Supply Helping Hand</strong></p>
       <p class="nudge">Your donation counts toward Tony’s total—help him cross the finish line!</p>
     </header>
 
@@ -164,8 +153,23 @@ footer .org-info a:hover{text-decoration:underline;}
       <div class="campaign-labels"><span>Start Oct 1</span><span>Finish Oct 31</span></div>
     </div>
 
+    <!-- Audio: Born to Run -->
+    <div class="audio-wrap">
+      <button id="audioToggle" aria-pressed="false">▶ Play “Born to Run”</button>
+      <div class="audio-player">
+        <iframe
+          id="ytPlayer"
+          width="100%" height="200" frameborder="0"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          src="https://www.youtube.com/embed/IxuThNgl3YA?start=8&enablejsapi=1&modestbranding=1&rel=0"
+          title="Bruce Springsteen - Born to Run (Official Video)">
+        </iframe>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
     <section class="board" id="leaderboard">
-      <!-- Lanes -->
+      <!-- First names shown; full names in data-name to match CSV -->
       <div class="lane" data-name="Sheila Schnellenberger">
         <div class="name">Sheila</div>
         <div class="track-area">
@@ -188,7 +192,8 @@ footer .org-info a:hover{text-decoration:underline;}
         <div class="name">Tony</div>
         <div class="track-area">
           <div class="start-line"></div><div class="finish-line"></div>
-          <a class="cta-emoji" id="tonyCta" href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank" aria-label="Donate to Team Tony">👉</a>
+          <!-- Clickable emoji that follows Tony -->
+          <a class="cta-emoji" id="tonyCta" href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank" rel="noopener" aria-label="Donate to Team Tony">👉</a>
           <div class="avatar"><img src="img/tony.PNG" alt="Tony headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
@@ -261,26 +266,22 @@ footer .org-info a:hover{text-decoration:underline;}
   </div>
 
 <script>
-/* Campaign timeline (Oct 1 → Oct 31) */
-(function campaignFillBar(){
+/* Campaign timeline fill (Oct 1 → Oct 31) */
+(function(){
   const start=new Date("2025-10-01T00:00:00");
   const end=new Date("2025-10-31T23:59:59");
   const fill=document.getElementById('campaignFill');
-
-  function updateFill(){
-    const now=new Date();
-    let pct=0;
-    if(now<=start) pct=0;
-    else if(now>=end) pct=100;
-    else pct=((now-start)/(end-start))*100;
+  function update(){
+    const now=new Date(); let pct=0;
+    if(now<=start) pct=0; else if(now>=end) pct=100; else pct=((now-start)/(end-start))*100;
     if(fill) fill.style.width=pct.toFixed(1)+"%";
   }
-  updateFill();
-  setInterval(updateFill, 60*60*1000);
-  document.addEventListener('visibilitychange',()=>!document.hidden && updateFill());
+  update();
+  setInterval(update, 60*60*1000);
+  document.addEventListener('visibilitychange',()=>!document.hidden && update());
 })();
 
-/* CSV → auto-rank lanes → move avatars; refresh each minute; timestamp; effects */
+/* CSV → auto-rank → layout; timestamp; Tony confetti; intro race; audio control */
 (function () {
   const CSV_URL="https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
   const bust=url=>url+(url.includes("?")?"&":"?")+"t="+Date.now();
@@ -290,6 +291,7 @@ footer .org-info a:hover{text-decoration:underline;}
   let laneData=[];
   let didIntro=false;
   let prevTonyRaised=0;
+  let introQueued=false;
 
   function parseCSV(text){
     const lines=text.trim().split(/\r?\n/);
@@ -303,8 +305,7 @@ footer .org-info a:hover{text-decoration:underline;}
   }
 
   function setTimestamp(){
-    const el=document.getElementById('lastUpdated');
-    if(!el) return;
+    const el=document.getElementById('lastUpdated'); if(!el) return;
     const now=new Date();
     const datePart = now.toLocaleDateString([], {month:'short', day:'2-digit'});
     const timePart = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
@@ -327,7 +328,8 @@ footer .org-info a:hover{text-decoration:underline;}
       const goal=Number(String(d.Goal||'10000').replace(/,/g,''));
       return { lane, name, raised, goal };
     });
-    // confetti if Tony increased
+
+    // Confetti if Tony increased
     const tonyRow = rows.find(r => (r.Name||'').toLowerCase()==='tony drew');
     if(tonyRow){
       const currentRaised = Number(String(tonyRow.Raised||'0').replace(/,/g,''));
@@ -359,23 +361,21 @@ footer .org-info a:hover{text-decoration:underline;}
 
     const minCenterX = startX + (avatarW/2);
     const maxCenterX = Math.max(minCenterX, trackW - labelW - 10 - (avatarW/2));
-
     return {track, label, avatar, minCenterX, maxCenterX, avatarW};
   }
 
   function layout(){
     laneData.forEach(({lane, raised, goal})=>{
-      const g = geometryFor(lane);
-      if(!g) return;
+      const g = geometryFor(lane); if(!g) return;
 
       const pct=clamp(goal>0 ? (raised/goal)*100 : 0, 0, 100);
       const centerX = g.minCenterX + (pct/100) * (g.maxCenterX - g.minCenterX);
-      g.avatar.style.left = (centerX - g.avatarW/2) + "px";
 
+      g.avatar.style.left = (centerX - g.avatarW/2) + "px";
       const label=lane.querySelector('.progress');
       label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
 
-      // If this is Tony, move the emoji to follow
+      // Move Tony's emoji pointer to follow him
       if((lane.getAttribute('data-name')||'').toLowerCase()==='tony drew'){
         const cta=document.getElementById('tonyCta');
         if(cta){ cta.style.left = (centerX - g.avatarW/2 - 40) + 'px'; }
@@ -383,11 +383,11 @@ footer .org-info a:hover{text-decoration:underline;}
     });
   }
 
-  // Intro: race to finish then back to real positions (first load only)
+  // Intro: race to finish then back to real positions (triggered on first play, or fallback after delay)
   async function raceIntro(){
     if(didIntro) return; didIntro=true;
-    // set to actual first (already done), then blast to finish
-    await new Promise(r=>setTimeout(r,500));
+    // blast to finish
+    await new Promise(r=>setTimeout(r,200));
     laneData.forEach(({lane})=>{
       const g = geometryFor(lane); if(!g) return;
       const finishLeft = (g.maxCenterX - g.avatarW/2) + 'px';
@@ -397,8 +397,9 @@ footer .org-info a:hover{text-decoration:underline;}
         if(cta) cta.style.left = (g.maxCenterX - g.avatarW/2 - 40) + 'px';
       }
     });
-    await new Promise(r=>setTimeout(r,1200));
-    layout(); // return to actual positions
+    // settle back to actual
+    await new Promise(r=>setTimeout(r,1400));
+    layout();
   }
 
   function confettiBurst(){
@@ -432,11 +433,43 @@ footer .org-info a:hover{text-decoration:underline;}
       rankLanes();
       layout();
       setTimestamp();
-      if(!didIntro) raceIntro();
+
+      // Fallback: if user never hits play in ~1.5s, still show the intro race once
+      if(!introQueued){
+        introQueued=true;
+        setTimeout(()=>{ if(!didIntro) raceIntro(); }, 1500);
+      }
     }catch(e){
       console.error('Failed to load CSV:', e);
     }
   }
+
+  // Audio toggle & sync
+  (function setupAudio(){
+    const btn=document.getElementById('audioToggle');
+    const frame=document.getElementById('ytPlayer');
+    if(!btn||!frame) return;
+
+    let playing=false;
+    const baseSrc="https://www.youtube.com/embed/IxuThNgl3YA?start=8&enablejsapi=1&modestbranding=1&rel=0";
+
+    btn.addEventListener('click', ()=>{
+      if(!playing){
+        // start audio and kick off intro race (if not already done)
+        frame.setAttribute('src', baseSrc + '&autoplay=1');
+        btn.textContent='⏸ Pause “Born to Run”';
+        btn.setAttribute('aria-pressed','true');
+        if(!didIntro) raceIntro();
+        playing=true;
+      }else{
+        // crude pause: reload without autoplay (no external API needed)
+        frame.setAttribute('src', baseSrc);
+        btn.textContent='▶ Play “Born to Run”';
+        btn.setAttribute('aria-pressed','false');
+        playing=false;
+      }
+    });
+  })();
 
   loadAndRender();
   window.addEventListener('resize', layout);
