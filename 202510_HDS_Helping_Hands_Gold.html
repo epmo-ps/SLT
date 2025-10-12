@@ -15,8 +15,8 @@
   --border:#e8e8e8;
   --name-col:120px;
   --lane-h:148px;
-  --avatar-size:110px;
-  --avatar-lift:24px;
+  --avatar-size:100px;
+  --avatar-lift:24px;      /* drop headshots lower */
   --maxw:980px;
 }
 *{box-sizing:border-box}
@@ -37,7 +37,7 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
 .lane{
   display:grid;
   grid-template-columns:var(--name-col) 1fr;
-  column-gap:0;
+  column-gap:0;               /* start line tight to names */
   align-items:center;
   background:#fff;
   border:2px dotted var(--brand);
@@ -53,12 +53,23 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   position:relative;
   height:calc(var(--lane-h) - 22px);
   border-radius:10px;
-  background:#fff;
+  /* Subtle glow toward finish */
+  background: linear-gradient(to right, #fff 80%, #fff4bf 100%);
   overflow:visible;
   display:flex;align-items:center;
 }
 .start-line{
   position:absolute;left:-8px;top:0;bottom:0;width:3px;background:var(--brand);border-radius:2px;
+}
+/* Finish line (dashed) */
+.finish-line{
+  position:absolute;right:0;top:0;bottom:0;width:3px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--brand), var(--brand) 6px,
+    #ffffff 6px, #ffffff 12px
+  );
+  border-radius:2px;
 }
 
 /* Avatars */
@@ -66,7 +77,8 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   position:absolute;z-index:20;
   top:calc(50% + var(--avatar-lift));
   transform:translateY(-50%);
-  transition:left .6s ease, top .6s ease;
+  /* smoother motion */
+  transition: left 1.5s cubic-bezier(.4,0,.2,1), top .6s ease;
   pointer-events:none;
 }
 .avatar img{
@@ -77,6 +89,7 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
 @keyframes bob{0%,100%{transform:translateY(-50%)}50%{transform:translateY(calc(-50% - 4px))}}
 @media (prefers-reduced-motion: reduce){.avatar img{animation:none !important}}
 
+/* Progress badge: full text, no ellipsis */
 .progress{
   position:absolute;right:8px;bottom:8px;background:#fff;border:1px solid var(--border);
   padding:4px 10px;border-radius:10px;font-size:13.5px;font-weight:600;color:#222;white-space:nowrap;
@@ -99,6 +112,7 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
 }
 
 footer{margin-top:16px;text-align:center;color:#444;font-size:13px;line-height:1.35;white-space:pre-line;}
+footer small{display:block;margin-top:4px;color:#666;}
 </style>
 </head>
 <body>
@@ -107,7 +121,7 @@ footer{margin-top:16px;text-align:center;color:#444;font-size:13px;line-height:1
       <h1>Tony Drew for the Gold! 🏆</h1>
       <p class="lead">The SLT are off to the races! 🏁</p>
       <p class="lead">👉 <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank"><strong>Donate Here</strong></a>
-        to <strong>HD Supply Helping Hand</strong> </p>
+        to support <strong>HD Supply Helping Hand</strong> and help our favorite racer cross the finish line! 💛</p>
     </header>
 
     <!-- Campaign timeline -->
@@ -117,74 +131,83 @@ footer{margin-top:16px;text-align:center;color:#444;font-size:13px;line-height:1
     </div>
 
     <section class="board" id="leaderboard">
+      <!-- Lanes (names shown; full in data-name) -->
       <div class="lane" data-name="Sheila Schnellenberger">
         <div class="name">Sheila</div>
         <div class="track-area">
-          <div class="start-line"></div>
+          <div class="start-line"></div><div class="finish-line"></div>
           <div class="avatar"><img src="img/sheila.PNG" alt="Sheila headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
       </div>
+
       <div class="lane" data-name="Chris Kelley">
         <div class="name">Chris</div>
         <div class="track-area">
-          <div class="start-line"></div>
+          <div class="start-line"></div><div class="finish-line"></div>
           <div class="avatar"><img src="img/chris.PNG" alt="Chris headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
       </div>
+
       <div class="lane" data-name="Tony Drew">
         <div class="name">Tony</div>
         <div class="track-area">
-          <div class="start-line"></div>
+          <div class="start-line"></div><div class="finish-line"></div>
           <div class="avatar"><img src="img/tony.PNG" alt="Tony headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
       </div>
+
       <div class="lane" data-name="John Drake">
         <div class="name">John</div>
         <div class="track-area">
-          <div class="start-line"></div>
+          <div class="start-line"></div><div class="finish-line"></div>
           <div class="avatar"><img src="img/john.PNG" alt="John headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
       </div>
+
       <div class="lane" data-name="Sami Nassar">
         <div class="name">Sami</div>
         <div class="track-area">
-          <div class="start-line"></div>
+          <div class="start-line"></div><div class="finish-line"></div>
           <div class="avatar"><img src="img/sami.PNG" alt="Sami headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
       </div>
+
       <div class="lane" data-name="Travis Lawrence">
         <div class="name">Travis</div>
         <div class="track-area">
-          <div class="start-line"></div>
+          <div class="start-line"></div><div class="finish-line"></div>
           <div class="avatar"><img src="img/travis.PNG" alt="Travis headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
       </div>
+
       <div class="lane" data-name="Charles DSouza">
         <div class="name">Charles</div>
         <div class="track-area">
-          <div class="start-line"></div>
+          <div class="start-line"></div><div class="finish-line"></div>
           <div class="avatar"><img src="img/charles.PNG" alt="Charles headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
       </div>
+
       <div class="lane" data-name="Dan McDevitt">
         <div class="name">Dan</div>
         <div class="track-area">
-          <div class="start-line"></div>
+          <div class="start-line"></div><div class="finish-line"></div>
           <div class="avatar"><img src="img/dan.PNG" alt="Dan headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
       </div>
+
       <div class="lane" data-name="Scott Boher">
         <div class="name">Scott</div>
         <div class="track-area">
-          <div class="start-line"></div>
+          <div class="start-line"></div><div class="finish-line"></div>
           <div class="avatar"><img src="img/scott.PNG" alt="Scott headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
@@ -195,57 +218,130 @@ footer{margin-top:16px;text-align:center;color:#444;font-size:13px;line-height:1
 HD Supply Charitable Fund, Inc
 A 501(c)(3) Public Charity
 EIN 42-1745656
+<small id="lastUpdated"></small>
     </footer>
   </div>
 
 <script>
-/* Campaign timeline fill */
-(function(){
-  const start=new Date("2025-10-01T00:00:00"),end=new Date("2025-10-31T23:59:59");
+/* Campaign timeline (Oct 1 → Oct 31) */
+(function campaignFillBar(){
+  const start=new Date("2025-10-01T00:00:00");
+  const end=new Date("2025-10-31T23:59:59");
   const fill=document.getElementById('campaignFill');
-  function update(){const now=new Date();let pct=0;if(now<=start)pct=0;else if(now>=end)pct=100;else pct=((now-start)/(end-start))*100;fill.style.width=pct.toFixed(1)+"%";}
-  update();setInterval(update,60*60*1000);document.addEventListener('visibilitychange',()=>!document.hidden&&update());
+
+  function updateFill(){
+    const now=new Date();
+    let pct=0;
+    if(now<=start) pct=0;
+    else if(now>=end) pct=100;
+    else pct=((now-start)/(end-start))*100;
+    if(fill) fill.style.width=pct.toFixed(1)+"%";
+  }
+  updateFill();
+  setInterval(updateFill, 60*60*1000);
+  document.addEventListener('visibilitychange',()=>!document.hidden && updateFill());
 })();
 
-/* CSV fetch + auto-rank + move avatars */
-(async function(){
+/* CSV → auto-rank lanes → move avatars; refresh each minute; update timestamp */
+(function () {
   const CSV_URL="https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
   const bust=url=>url+(url.includes("?")?"&":"?")+"t="+Date.now();
+
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const fmt=n=>Number(String(n||0).replace(/,/g,'')||0).toLocaleString('en-US',{maximumFractionDigits:0});
 
   let laneData=[];
 
-  function parseCSV(t){const l=t.trim().split(/\r?\n/);if(!l.length)return[];const h=l.shift().split(',').map(x=>x.trim());return l.map(r=>{const c=r.split(',').map(x=>x.trim()),o={};h.forEach((v,i)=>o[v]=c[i]||'');return o})}
-
-  async function load(){
-    const res=await fetch(bust(CSV_URL),{cache:'no-store'});const txt=await res.text();const rows=parseCSV(txt);
-    const map=new Map(rows.map(r=>[r.Name,r]));const lanes=[...document.querySelectorAll('.lane[data-name]')];
-    laneData=lanes.map(l=>{const n=l.getAttribute('data-name'),d=map.get(n)||{},r=+String(d.Raised||'0').replace(/,/g,''),g=+String(d.Goal||'10000').replace(/,/g,'');return{lane:l,name:n,raised:r,goal:g}});
-    laneData.sort((a,b)=>b.raised-a.raised);
-    const board=document.querySelector('#leaderboard');laneData.forEach(({lane})=>board.appendChild(lane));
-    layout();
-  }
-
-  function layout(){
-    laneData.forEach(({lane,raised,goal})=>{
-      const track=lane.querySelector('.track-area'),line=lane.querySelector('.start-line'),label=lane.querySelector('.progress'),avatar=lane.querySelector('.avatar');
-      if(!track||!line||!label||!avatar)return;
-      const pct=clamp(goal>0?(raised/goal)*100:0,0,100);
-      const tRect=track.getBoundingClientRect(),lRect=line.getBoundingClientRect();
-      const startX=Math.max(0,lRect.right-tRect.left)+2;
-      const tW=track.clientWidth,labelW=label.offsetWidth,aW=avatar.getBoundingClientRect().width||72;
-      const min=startX+aW/2,max=Math.max(min,tW-labelW-10-aW/2);
-      const c=min+(pct/100)*(max-min);
-      avatar.style.left=(c-aW/2)+"px";
-      label.textContent=`$${fmt(raised)} / $${fmt(goal)}`;
+  function parseCSV(text){
+    const lines=text.trim().split(/\r?\n/);
+    if(!lines.length) return [];
+    const headers=lines.shift().split(',').map(h=>h.trim());
+    return lines.map(line=>{
+      const cells=line.split(',').map(c=>c.trim());
+      const row={}; headers.forEach((h,i)=>row[h]=cells[i]||'');
+      return row;
     });
   }
 
-  await load();
-  window.addEventListener('resize',layout);
-  setInterval(load,60*1000);
-  document.addEventListener('visibilitychange',()=>!document.hidden&&load());
+  function setTimestamp(){
+    const el=document.getElementById('lastUpdated');
+    if(!el) return;
+    const now=new Date();
+    el.textContent="Last updated " + now.toLocaleString([], {hour:'2-digit', minute:'2-digit'});
+  }
+
+  async function fetchRows(){
+    const resp=await fetch(bust(CSV_URL),{cache:'no-store'});
+    const text=await resp.text();
+    return parseCSV(text);
+  }
+
+  function mapLanes(rows){
+    const map=new Map(rows.map(r=>[r.Name,r]));
+    const lanes=[...document.querySelectorAll('.lane[data-name]')];
+    laneData=lanes.map(lane=>{
+      const name=lane.getAttribute('data-name');
+      const d=map.get(name)||{};
+      const raised=Number(String(d.Raised||'0').replace(/,/g,''));
+      const goal=Number(String(d.Goal||'10000').replace(/,/g,''));
+      return { lane, name, raised, goal };
+    });
+  }
+
+  function rankLanes(){
+    laneData.sort((a,b)=>b.raised-a.raised);
+    const board=document.querySelector('#leaderboard');
+    laneData.forEach(({lane})=>board.appendChild(lane));
+  }
+
+  function layout(){
+    laneData.forEach(({lane, raised, goal})=>{
+      const track=lane.querySelector('.track-area');
+      const startLine=lane.querySelector('.start-line');
+      const label=lane.querySelector('.progress');
+      const avatar=lane.querySelector('.avatar');
+      if(!track||!startLine||!label||!avatar) return;
+
+      const pct=clamp(goal>0 ? (raised/goal)*100 : 0, 0, 100);
+
+      // geometry
+      const trackRect = track.getBoundingClientRect();
+      const lineRect  = startLine.getBoundingClientRect();
+
+      // start just after the yellow line
+      const startX = Math.max(0, lineRect.right - trackRect.left) + 2;
+
+      const trackW  = track.clientWidth;
+      const labelW  = label.offsetWidth;
+      const avatarW = avatar.getBoundingClientRect().width || 72;
+
+      // center-based travel; avoid colliding with the badge at right
+      const minCenterX = startX + (avatarW/2);
+      const maxCenterX = Math.max(minCenterX, trackW - labelW - 10 - (avatarW/2));
+      const centerX = minCenterX + (pct/100) * (maxCenterX - minCenterX);
+
+      avatar.style.left = (centerX - avatarW/2) + "px";
+      label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
+    });
+  }
+
+  async function loadAndRender(){
+    try{
+      const rows=await fetchRows();
+      mapLanes(rows);
+      rankLanes();   // reorder lanes based on Raised
+      layout();      // place avatars + amounts
+      setTimestamp();
+    }catch(e){
+      console.error('Failed to load CSV:', e);
+    }
+  }
+
+  loadAndRender();
+  window.addEventListener('load', layout);
+  window.addEventListener('resize', layout);
+  setInterval(loadAndRender, 60*1000);
+  document.addEventListener('visibilitychange',()=>!document.hidden && loadAndRender());
 })();
 </script>
 </body>
