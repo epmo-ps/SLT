@@ -13,8 +13,8 @@
   --bg:#f7f7f7;
   --card:#ffffff;
   --border:#e8e8e8;
-  --name-col:165px;
-  --lane-h:92px;
+  --name-col:120px;
+  --lane-h:88px;
   --maxw:980px;
 }
   *{box-sizing:border-box}
@@ -62,7 +62,7 @@
   <div class="wrap">
     <header>
       <h1>Tony Drew for the Gold! 🏆</h1>
-      <p class="lead">👉 <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank" rel="noopener">Donate Here</a> – HD Supply Helping Hand! Ready, set, GIVE! 🏁</p>
+      <p class="lead">SLT are in a race! 👉 <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank" rel="noopener">Donate Here</a> Ready, set, GIVE! 🏁</p>
     </header>
 
     <!-- Campaign timeline -->
@@ -219,29 +219,39 @@ EIN 42-1745656
     layout();
   }
 
-  function layout(){
-    laneData.forEach(({lane, raised, goal})=>{
-// Compute travel range inside the track: from just after the yellow line to just before the amount badge
-const trackRect = track.getBoundingClientRect();
-const lineRect  = startLine.getBoundingClientRect();
+function layout(){
+  laneData.forEach(({lane, raised, goal})=>{
+    // Grab elements for THIS lane
+    const track     = lane.querySelector('.track-area');
+    const startLine = lane.querySelector('.start-line');
+    const label     = lane.querySelector('.progress');
+    const avatar    = lane.querySelector('.avatar');
+    if (!track || !startLine || !label || !avatar) return;
 
-// distance from track's left edge to the far edge of the start line
-const startX = Math.max(0, lineRect.right - trackRect.left) + 6;  // +6px breathing room
+    // % to position
+    const pct = clamp(goal > 0 ? (raised / goal) * 100 : 0, 0, 100);
 
-const trackW = track.clientWidth;
-const labelW = label.offsetWidth;
-const avatarW = avatar.getBoundingClientRect().width || 72;
+    // Compute travel range: just after the yellow line → just before the amount badge
+    const trackRect = track.getBoundingClientRect();
+    const lineRect  = startLine.getBoundingClientRect();
 
-// End just before the amount bubble
-const endX = Math.max(startX, trackW - labelW - avatarW - 10);
+    // distance from track's left edge to the right edge of the start line
+    const startX = Math.max(0, lineRect.right - trackRect.left) + 6; // small breathing room
 
-const pct = clamp(goal > 0 ? (raised / goal) * 100 : 0, 0, 100);
-const moveX = startX + (pct / 100) * (endX - startX);
+    const trackW  = track.clientWidth;
+    const labelW  = label.offsetWidth;
+    const avatarW = avatar.getBoundingClientRect().width || 72;
 
-avatar.style.left = moveX + 'px';
-      label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
-    });
-  }
+    // end just before amount bubble
+    const endX = Math.max(startX, trackW - labelW - avatarW - 10);
+
+    const moveX = startX + (pct / 100) * (endX - startX);
+    avatar.style.left = moveX + 'px';
+
+    // update text
+    label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
+  });
+}
 
   try{
     await loadAndRender();
