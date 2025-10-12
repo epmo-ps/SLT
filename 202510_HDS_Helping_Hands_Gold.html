@@ -14,9 +14,9 @@
   --card:#ffffff;
   --border:#e8e8e8;
   --name-col:120px;        /* desktop default */
-  --lane-h:130px;          /* taller so 100px heads breathe */
+  --lane-h:148px;          /* more vertical space */
   --avatar-size:100px;     /* headshot height */
-  --avatar-lift:0px;       /* vertical centering of the headshot */
+  --avatar-lift:24px;      /* drop headshots lower in the lane */
   --maxw:980px;
 }
 *{box-sizing:border-box}
@@ -37,7 +37,7 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
 .lane{
   display:grid;
   grid-template-columns:var(--name-col) 1fr;
-  column-gap:4px;             /* tighter so the start line feels closer to names */
+  column-gap:4px;             /* start line feels closer to names */
   align-items:center;
   background:#fff;
   border:2px dotted var(--brand);
@@ -59,16 +59,16 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   padding-right:112px;         /* reserve space so the progress badge never crowds */
 }
 .start-line{
-  position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand);border-radius:2px; /* slimmer, closer */
+  position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand);border-radius:2px;
 }
 
 /* Avatars “run” on the track, above borders */
 .avatar{
   position:absolute;
   z-index:20;
-  top:calc(50% + var(--avatar-lift));
-  transform:translateY(-50%);
-  transition:left .6s ease;
+  top:calc(50% + var(--avatar-lift));  /* lower the avatar */
+  transform:translateY(-50%);          /* keep bob centered around new baseline */
+  transition:left .6s ease, top .6s ease;
   pointer-events:none;
 }
 .avatar img{
@@ -105,18 +105,18 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   :root{ --name-col:130px; }   /* a bit roomier for mid screens */
 }
 @media (max-width:640px){
-  :root{ --name-col:110px; --lane-h:120px; }
+  :root{ --name-col:110px; --lane-h:132px; }
   .board{padding:10px}
   .progress{ font-size:12.5px; padding:3px 8px; }
   .track-area{ padding-right:96px; }
 }
 @media (max-width:420px){
-  :root{ --name-col:96px; --lane-h:116px; }
+  :root{ --name-col:96px; --lane-h:128px; }
   .progress{ font-size:12px; padding:3px 8px; }
   .track-area{ padding-right:88px; }
 }
 @media (max-width:360px){
-  :root{ --name-col:88px; --lane-h:112px; }
+  :root{ --name-col:88px; --lane-h:124px; }
   .progress{ font-size:11.5px; padding:3px 7px; right:6px; bottom:6px; }
   .track-area{ padding-right:80px; }
 }
@@ -246,7 +246,7 @@ EIN 42-1745656
     if(fill) fill.style.width=pct.toFixed(1)+"%";
   }
   updateFill();
-  /* Update the bar daily-ish (and on visibility change) */
+  /* Update the bar hourly and on visibility change */
   setInterval(updateFill, 60*60*1000);
   document.addEventListener('visibilitychange',()=>!document.hidden && updateFill());
 })();
