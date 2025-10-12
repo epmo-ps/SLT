@@ -14,7 +14,9 @@
   --card:#ffffff;
   --border:#e8e8e8;
   --name-col:120px;
-  --lane-h:90px;
+  --lane-h:120px;
+  --avatar-size: 100px; 
+  --avatar-lift: 4px;  
   --maxw:980px;
 }
   *{box-sizing:border-box}
@@ -35,7 +37,7 @@
   .lane{display:grid;grid-template-columns:var(--name-col) 1fr;column-gap:8px;align-items:center;background:#fff;border:2px dotted var(--brand);border-radius:12px;padding:10px;min-height:var(--lane-h);margin:8px 0;overflow:visible;}
   .name{font-family:Oswald,system-ui;font-size:clamp(16px,3.4vw,20px);padding-left:4px;word-break:break-word;}
 
-  .track-area{position:relative;height:calc(var(--lane-h) - 14px);border-radius:10px;background:#fff;overflow:visible;display:flex;align-items:center;}
+  .track-area{position:relative;height:calc(var(--lane-h) - 22px);border-radius:10px;background:#fff;overflow:visible;display:flex;align-items:center;}
 .start-line {
   position: absolute;
   left: 0;
@@ -45,59 +47,36 @@
   background: var(--brand);
   border-radius: 3px;
 }
-.avatar {
+
+/* Avatar container: floats above everything in the lane */
+.avatar{
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  z-index: 20;                           /* above dotted border and line */
+  top: calc(50% + var(--avatar-lift));   /* fine-tune vertical position */
+  transform: translateY(-50%);           /* true centering math */
   transition: left 0.6s ease;
-  z-index: 10;
   pointer-events: none;
 }
 
-.avatar img {
-  height: 100px;            
-  width: auto;             
-  border-radius: 50%;
+
+.avatar img{
+  height: var(--avatar-size);
+  width: auto;                         
+  border-radius: 12px;
   border: 3px solid var(--brand);
-  background: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  object-fit: cover;
-  animation: bob 2s ease-in-out infinite;
-  will-change: transform;
-}
-
-/* Bobbing animation */
-@keyframes bob {
-  0%, 100% { transform: translateY(-50%); }
-  50% { transform: translateY(calc(-50% - 4px)); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .avatar img { animation: none !important; }
-}
-
-/* 2) Final avatar sizing + animation */
-.avatar {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  height: calc(var(--lane-h) - 20px);
-  transition: left 0.6s ease;
-  z-index: 5;
-  pointer-events: none;
-}
-.avatar img {
-  width: 45px;                 /* smaller heads */
-  height: 45px;
-  border-radius: 10px;
-  border: 2px solid var(--brand);
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  object-fit: cover;
-  position: relative;
-  top: -2px;                   /* sits “on” the track */
-  animation: bob 2.2s ease-in-out infinite;  /* <— bring bob back */
+  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+  object-fit: cover;                     
+  animation: bob 2.2s ease-in-out infinite;
   will-change: transform;
+}
+
+@keyframes bob{
+  0%,100%{ transform: translateY(-50%); }
+  50%    { transform: translateY(calc(-50% - 4px)); }
+}
+@media (prefers-reduced-motion: reduce){
+  .avatar img{ animation: none !important; }
 }
 
   .progress{position:absolute;right:8px;bottom:8px;background:#fff;border:1px solid var(--border);padding:4px 10px;border-radius:10px;font-size:13.5px;font-weight:600;color:#222;white-space:nowrap;}
@@ -217,104 +196,57 @@ A 501(c)(3) Public Charity
 EIN 42-1745656
     </footer>
   </div>
-
 <script>
-/* Campaign timeline (Oct 1 → Oct 31) */
-(function(){
-  const start=new Date("2025-10-01T00:00:00");
-  const end=new Date("2025-10-31T23:59:59");
-  const now=new Date();
-  const fill=document.getElementById('campaignFill');
-  let pct=0;
-  if(now<=start) pct=0;
-  else if(now>=end) pct=100;
-  else pct=((now-start)/(end-start))*100;
-  fill.style.width=pct.toFixed(1)+"%";
-})();
-
-/* CSV → rank → move avatars between start line and amount badge */
 (async function () {
-  const CSV_URL="https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
-  const withBust=CSV_URL+(CSV_URL.includes("?")?"&":"?")+"t="+Date.now();
+  const CSV_URL = "https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
+  const withBust = CSV_URL + "?t=" + Date.now();
 
-  function parseCSV(text){
-    const lines=text.trim().split(/\r?\n/);
-    if(!lines.length) return [];
-    const headers=lines.shift().split(',').map(h=>h.trim());
-    return lines.map(line=>{
-      const cells=line.split(',').map(c=>c.trim());
-      const row={}; headers.forEach((h,i)=>row[h]=cells[i]||'');
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/);
+    if (!lines.length) return [];
+    const headers = lines.shift().split(',').map(h => h.trim());
+    return lines.map(line => {
+      const cells = line.split(',').map(c => c.trim());
+      const row = {};
+      headers.forEach((h, i) => row[h] = cells[i] || '');
       return row;
     });
   }
-  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-  const fmt=n=>Number(String(n||0).replace(/,/g,'')||0).toLocaleString('en-US',{maximumFractionDigits:0});
 
-  let laneData=[];
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const fmt = n => Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
 
-  async function loadAndRender(){
-    const resp=await fetch(withBust,{cache:'no-store'});
-    const csv=await resp.text();
-    const rows=parseCSV(csv);
-    const map=new Map(rows.map(r=>[r.Name,r]));
+  async function layout() {
+    const resp = await fetch(withBust, { cache: 'no-store' });
+    const csv = await resp.text();
+    const rows = parseCSV(csv);
+    const map = new Map(rows.map(r => [r.Name, r]));
+    const lanes = Array.from(document.querySelectorAll('.lane[data-name]'));
+    const info = [];
 
-    const lanes=[...document.querySelectorAll('.lane[data-name]')];
-    laneData=lanes.map(lane=>{
-      const name=lane.getAttribute('data-name');
-      const d=map.get(name)||{};
-      const raised=Number(String(d.Raised||'0').replace(/,/g,''));
-      const goal=Number(String(d.Goal||'10000').replace(/,/g,''));
-      return { lane, name, raised, goal };
+    lanes.forEach(lane => {
+      const name = lane.getAttribute('data-name');
+      const data = map.get(name) || {};
+      const raised = Number(data.Raised || 0);
+      const goal = Number(data.Goal || 10000);
+      info.push({ lane, name, raised, goal });
     });
 
-    // sort and re-append
-    laneData.sort((a,b)=>b.raised-a.raised);
-    const board=document.getElementById('leaderboard');
-    laneData.forEach(({lane})=>board.appendChild(lane));
+    info.sort((a, b) => b.raised - a.raised);
+    const container = document.querySelector('.track');
 
-    layout();
+    info.forEach(({ lane, raised, goal }) => {
+      const pct = clamp(goal > 0 ? (raised / goal) * 100 : 0, 0, 100);
+      const avatar = lane.querySelector('.avatar');
+      if (avatar) avatar.style.left = `calc(${pct.toFixed(2)}% - 50px)`;
+      const label = lane.querySelector('.progress-text');
+      if (label) label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
+      container.appendChild(lane);
+    });
   }
 
-function layout(){
-  laneData.forEach(({lane, raised, goal})=>{
-    // Grab elements for THIS lane
-    const track     = lane.querySelector('.track-area');
-    const startLine = lane.querySelector('.start-line');
-    const label     = lane.querySelector('.progress');
-    const avatar    = lane.querySelector('.avatar');
-    if (!track || !startLine || !label || !avatar) return;
-
-    // % to position
-    const pct = clamp(goal > 0 ? (raised / goal) * 100 : 0, 0, 100);
-
-    // Compute travel range: just after the yellow line → just before the amount badge
-    const trackRect = track.getBoundingClientRect();
-    const lineRect  = startLine.getBoundingClientRect();
-
-    // distance from track's left edge to the right edge of the start line
-    const startX = Math.max(0, lineRect.right - trackRect.left) + 6; // small breathing room
-
-    const trackW  = track.clientWidth;
-    const labelW  = label.offsetWidth;
-    const avatarW = avatar.getBoundingClientRect().width || 72;
-
-    // end just before amount bubble
-    const endX = Math.max(startX, trackW - labelW - avatarW - 10);
-
-    const moveX = startX + (pct / 100) * (endX - startX);
-    avatar.style.left = moveX + 'px';
-
-    // update text
-    label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
-  });
-}
-
-  try{
-    await loadAndRender();
-    window.addEventListener('resize', layout);
-  }catch(e){
-    console.error('Failed to load CSV:', e);
-  }
+  // 👇 Call layout when the page fully loads (images included)
+  window.addEventListener('load', layout);
 })();
 </script>
 </body>
