@@ -13,10 +13,10 @@
   --bg:#f7f7f7;
   --card:#ffffff;
   --border:#e8e8e8;
-  --name-col:120px;
-  --lane-h:130px;             /* taller so 100px heads breathe */
-  --avatar-size:100px;        /* headshot height */
-  --avatar-lift:8px;          /* + moves lower; - moves higher */
+  --name-col:120px;        /* desktop default */
+  --lane-h:130px;          /* taller so 100px heads breathe */
+  --avatar-size:100px;     /* headshot height */
+  --avatar-lift:0px;       /* vertical centering of the headshot */
   --maxw:980px;
 }
 *{box-sizing:border-box}
@@ -37,7 +37,7 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
 .lane{
   display:grid;
   grid-template-columns:var(--name-col) 1fr;
-  column-gap:8px;
+  column-gap:4px;             /* tighter so the start line feels closer to names */
   align-items:center;
   background:#fff;
   border:2px dotted var(--brand);
@@ -45,7 +45,7 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   padding:10px;
   min-height:var(--lane-h);
   margin:8px 0;
-  overflow:visible;                 /* let avatars float above border */
+  overflow:visible;            /* allow avatars to float above border */
 }
 .name{font-family:Oswald,system-ui;font-size:clamp(16px,3.4vw,20px);padding-left:4px;word-break:break-word;}
 
@@ -54,11 +54,12 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   height:calc(var(--lane-h) - 22px);
   border-radius:10px;
   background:#fff;
-  overflow:visible;                 /* avoid clipping avatars */
+  overflow:visible;
   display:flex;align-items:center;
+  padding-right:112px;         /* reserve space so the progress badge never crowds */
 }
 .start-line{
-  position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand);border-radius:3px;
+  position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand);border-radius:2px; /* slimmer, closer */
 }
 
 /* Avatars “run” on the track, above borders */
@@ -91,17 +92,36 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   .avatar img{ animation:none !important; }
 }
 
+/* Progress badge anchored at far right; compact on tiny screens */
 .progress{
   position:absolute;right:8px;bottom:8px;background:#fff;border:1px solid var(--border);
   padding:4px 10px;border-radius:10px;font-size:13.5px;font-weight:600;color:#222;white-space:nowrap;
+  max-width:46%;
+  text-overflow:ellipsis;overflow:hidden;
+}
+
+/* Responsive tweaks for names column, lane height, and badge sizing */
+@media (max-width:900px){
+  :root{ --name-col:130px; }   /* a bit roomier for mid screens */
+}
+@media (max-width:640px){
+  :root{ --name-col:110px; --lane-h:120px; }
+  .board{padding:10px}
+  .progress{ font-size:12.5px; padding:3px 8px; }
+  .track-area{ padding-right:96px; }
+}
+@media (max-width:420px){
+  :root{ --name-col:96px; --lane-h:116px; }
+  .progress{ font-size:12px; padding:3px 8px; }
+  .track-area{ padding-right:88px; }
+}
+@media (max-width:360px){
+  :root{ --name-col:88px; --lane-h:112px; }
+  .progress{ font-size:11.5px; padding:3px 7px; right:6px; bottom:6px; }
+  .track-area{ padding-right:80px; }
 }
 
 footer{margin-top:16px;text-align:center;color:#444;font-size:13px;line-height:1.35;white-space:pre-line;}
-
-@media (max-width:640px){
-  :root{--name-col:110px;--lane-h:120px}
-  .board{padding:10px}
-}
 </style>
 </head>
 <body>
@@ -212,22 +232,31 @@ EIN 42-1745656
 
 <script>
 /* Campaign timeline (Oct 1 → Oct 31) */
-(function(){
+(function campaignFillBar(){
   const start=new Date("2025-10-01T00:00:00");
   const end=new Date("2025-10-31T23:59:59");
-  const now=new Date();
   const fill=document.getElementById('campaignFill');
-  let pct=0;
-  if(now<=start) pct=0;
-  else if(now>=end) pct=100;
-  else pct=((now-start)/(end-start))*100;
-  if(fill) fill.style.width=pct.toFixed(1)+"%";
+
+  function updateFill(){
+    const now=new Date();
+    let pct=0;
+    if(now<=start) pct=0;
+    else if(now>=end) pct=100;
+    else pct=((now-start)/(end-start))*100;
+    if(fill) fill.style.width=pct.toFixed(1)+"%";
+  }
+  updateFill();
+  /* Update the bar daily-ish (and on visibility change) */
+  setInterval(updateFill, 60*60*1000);
+  document.addEventListener('visibilitychange',()=>!document.hidden && updateFill());
 })();
 
-/* CSV → rank lanes → move avatars between start line & amount badge */
-(async function () {
+/* CSV → rank lanes → move avatars (centered) between start line & amount badge
+   + Auto-refresh every 60 seconds without page reload */
+(function () {
   const CSV_URL="https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
-  const withBust=CSV_URL+(CSV_URL.includes("?")?"&":"?")+"t="+Date.now();
+
+  function bust(url){ return url+(url.includes("?")?"&":"?")+"t="+Date.now(); }
 
   function parseCSV(text){
     const lines=text.trim().split(/\r?\n/);
@@ -244,12 +273,14 @@ EIN 42-1745656
 
   let laneData=[];
 
-  async function loadAndRender(){
-    const resp=await fetch(withBust,{cache:'no-store'});
-    const csv=await resp.text();
-    const rows=parseCSV(csv);
-    const map=new Map(rows.map(r=>[r.Name,r]));
+  async function fetchRows(){
+    const resp=await fetch(bust(CSV_URL),{cache:'no-store'});
+    const text=await resp.text();
+    return parseCSV(text);
+  }
 
+  function mapLanes(rows){
+    const map=new Map(rows.map(r=>[r.Name,r]));
     const lanes=[...document.querySelectorAll('.lane[data-name]')];
     laneData=lanes.map(lane=>{
       const name=lane.getAttribute('data-name');
@@ -258,13 +289,12 @@ EIN 42-1745656
       const goal=Number(String(d.Goal||'10000').replace(/,/g,''));
       return { lane, name, raised, goal };
     });
+  }
 
-    // sort by amount raised and re-append to auto-rank
+  function rankLanes(){
     laneData.sort((a,b)=>b.raised-a.raised);
     const board=document.querySelector('#leaderboard');
     laneData.forEach(({lane})=>board.appendChild(lane));
-
-    layout(); // position avatars now that DOM order is final
   }
 
   function layout(){
@@ -277,31 +307,50 @@ EIN 42-1745656
 
       const pct=clamp(goal>0 ? (raised/goal)*100 : 0, 0, 100);
 
-      // compute travel range: just after the yellow line → before the amount bubble
+      // geometry
       const trackRect = track.getBoundingClientRect();
       const lineRect  = startLine.getBoundingClientRect();
 
-      const startX = Math.max(0, lineRect.right - trackRect.left) + 6; // small buffer
+      // starting just after the yellow line, with a tight buffer
+      const startX = Math.max(0, lineRect.right - trackRect.left) + 2;
 
       const trackW  = track.clientWidth;
       const labelW  = label.offsetWidth;
       const avatarW = avatar.getBoundingClientRect().width || 72;
-      const endX = Math.max(startX, trackW - labelW - avatarW - 10);
 
-      const moveX = startX + (pct/100) * (endX - startX);
-      avatar.style.left = moveX + "px";
+      // compute range using the AVATAR CENTER
+      const minCenterX = startX + (avatarW/2);
+      const maxCenterX = Math.max(minCenterX, trackW - labelW - 10 - (avatarW/2));
+
+      const centerX = minCenterX + (pct/100) * (maxCenterX - minCenterX);
+
+      avatar.style.left = (centerX - avatarW/2) + "px";
 
       label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
     });
   }
 
-  try{
-    await loadAndRender();
-    window.addEventListener('load', layout);   // ensure sizes after images load
-    window.addEventListener('resize', layout); // keep aligned on resize
-  }catch(e){
-    console.error('Failed to load CSV:', e);
+  async function loadAndRender(){
+    try{
+      const rows=await fetchRows();
+      mapLanes(rows);
+      rankLanes();
+      layout();
+    }catch(e){
+      console.error('Failed to load CSV:', e);
+    }
   }
+
+  // Initial load
+  loadAndRender();
+
+  // Re-layout after images load/resize
+  window.addEventListener('load', layout);
+  window.addEventListener('resize', layout);
+
+  // Auto-refresh data every 60 seconds; also when tab becomes visible again
+  setInterval(loadAndRender, 60*1000);
+  document.addEventListener('visibilitychange',()=>!document.hidden && loadAndRender());
 })();
 </script>
 </body>
