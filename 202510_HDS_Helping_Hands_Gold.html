@@ -25,8 +25,9 @@ body{margin:0;padding:18px 12px 36px;font-family:Montserrat,system-ui,-apple-sys
 
 header{text-align:center;margin-bottom:12px;}
 header h1{font-family:Oswald,Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;font-size:clamp(26px,5vw,40px);margin:0 0 6px;}
-header .lead{margin:0 0 10px;font-size:clamp(14px,3.2vw,16px);}
+header .lead{margin:0 0 4px;font-size:clamp(14px,3.2vw,16px);}
 header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted currentColor;}
+header .nudge{font-size:13px;color:#666;margin-top:4px;font-style:italic;}
 
 .campaign{margin:14px auto 8px;max-width:520px;}
 .campaign-bar{height:10px;border-radius:6px;background:#e1e1e1;overflow:hidden;}
@@ -53,8 +54,8 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   position:relative;
   height:calc(var(--lane-h) - 22px);
   border-radius:10px;
-  /* Subtle glow toward finish */
-  background: linear-gradient(to right,  #fff 0%, #fff 45%, #fff4bf 70%, #fff4bf 100%);
+  /* Midpoint glow starts ~50% to motivate progress */
+  background: linear-gradient(to right, #fff 0%, #fff 45%, #fff4bf 70%, #fff4bf 100%);
   overflow:visible;
   display:flex;align-items:center;
 }
@@ -70,6 +71,15 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
     #ffffff 6px, #ffffff 12px
   );
   border-radius:2px;
+}
+
+/* Emphasize Tony’s lane dynamically (follows him even when ranking changes) */
+.lane[data-name="Tony Drew"] .track-area{
+  background: linear-gradient(to right, #fff 0%, #fff 45%, #fff1a6 70%, #fff1a6 100%);
+  box-shadow: inset 0 0 12px rgba(255,201,7,.4);
+}
+.lane[data-name="Tony Drew"] .name{
+  color:#d4a300;font-weight:700;
 }
 
 /* Avatars */
@@ -95,6 +105,17 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   padding:4px 10px;border-radius:10px;font-size:13.5px;font-weight:600;color:#222;white-space:nowrap;
 }
 
+/* CTA emoji that follows Tony's avatar */
+.cta-emoji{
+  position:absolute;z-index:30;
+  top:calc(50% + var(--avatar-lift));
+  transform:translateY(-50%);
+  font-size:28px;line-height:1;text-decoration:none;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.2));
+  animation:bob 2.2s ease-in-out infinite;
+}
+.cta-emoji:focus{outline:2px solid #0a58ca;border-radius:6px}
+
 /* Responsive */
 @media (max-width:900px){ :root{ --name-col:130px; } }
 @media (max-width:640px){
@@ -110,39 +131,26 @@ header .lead a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted curre
   :root{ --name-col:88px; --lane-h:124px; }
   .progress{ font-size:11.5px; padding:3px 7px; right:6px; bottom:6px; }
 }
-footer {
-  margin-top: 20px;
-  text-align: center;
-  color: #444;
-  font-size: 13px;
-  line-height: 1.4;
-}
-footer small {
-  display: block;
-  margin-bottom: 10px;
-  font-size: 12.5px;
-  color: #666;
-  letter-spacing: 0.2px;
-  font-style: italic;
-}
-footer .org-info a {
-  color: #0a58ca;
-  text-decoration: none;
-  border-bottom: 1px dotted currentColor;
-}
-footer .org-info a:hover {
-  text-decoration: underline;
-}
 
+footer{
+  margin-top:20px;text-align:center;color:#444;font-size:13px;line-height:1.4;
+}
+footer small{
+  display:block;margin-bottom:10px;font-size:12.5px;color:#666;letter-spacing:.2px;font-style:italic;
+}
+footer .org-info a{color:#0a58ca;text-decoration:none;border-bottom:1px dotted currentColor;}
+footer .org-info a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <h1>Tony Drew for the Gold! 🏆</h1>
-      <p class="lead">The SLT are off to the races! 🏁</p>
-      <p class="lead">👉 <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank"><strong>Donate Here</strong></a>
-        to <strong>HD Supply Helping Hand</strong> </p>
+      <p class="lead">
+        👉 <a href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank"><strong>Donate Here to Team Tony Drew</strong></a><br>
+        <strong>HD Supply Helping Hand</strong>
+      </p>
+      <p class="nudge">Your donation counts toward Tony’s total—help him cross the finish line!</p>
     </header>
 
     <!-- Campaign timeline -->
@@ -152,7 +160,7 @@ footer .org-info a:hover {
     </div>
 
     <section class="board" id="leaderboard">
-      <!-- Lanes (names shown; full in data-name) -->
+      <!-- Lanes -->
       <div class="lane" data-name="Sheila Schnellenberger">
         <div class="name">Sheila</div>
         <div class="track-area">
@@ -175,6 +183,7 @@ footer .org-info a:hover {
         <div class="name">Tony</div>
         <div class="track-area">
           <div class="start-line"></div><div class="finish-line"></div>
+          <a class="cta-emoji" id="tonyCta" href="https://givebutter.com/fO5IHJ/tony-drew" target="_blank" aria-label="Donate to Team Tony">👉</a>
           <div class="avatar"><img src="img/tony.PNG" alt="Tony headshot"></div>
           <div class="progress">$0 / $10,000</div>
         </div>
@@ -235,15 +244,16 @@ footer .org-info a:hover {
       </div>
     </section>
 
- <footer>
-  <small id="lastUpdated"></small>
-  <div class="org-info">
-    HD Supply Charitable Fund, Inc<br>
-    A 501(c)(3) Public Charity<br>
-    EIN 42-1745656<br>
-    <a href="https://hdsupply.com" target="_blank">Visit HD Supply</a>
+    <footer>
+      <small id="lastUpdated"></small>
+      <div class="org-info">
+        HD Supply Charitable Fund, Inc<br>
+        A 501(c)(3) Public Charity<br>
+        EIN 42-1745656<br>
+        <a href="https://hdsupply.com" target="_blank" rel="noopener">Visit HD Supply</a>
+      </div>
+    </footer>
   </div>
-</footer>
 
 <script>
 /* Campaign timeline (Oct 1 → Oct 31) */
@@ -265,15 +275,16 @@ footer .org-info a:hover {
   document.addEventListener('visibilitychange',()=>!document.hidden && updateFill());
 })();
 
-/* CSV → auto-rank lanes → move avatars; refresh each minute; update timestamp */
+/* CSV → auto-rank lanes → move avatars; refresh each minute; timestamp; effects */
 (function () {
   const CSV_URL="https://raw.githubusercontent.com/epmo-ps/SLT/main/slt.csv";
   const bust=url=>url+(url.includes("?")?"&":"?")+"t="+Date.now();
 
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const fmt=n=>Number(String(n||0).replace(/,/g,'')||0).toLocaleString('en-US',{maximumFractionDigits:0});
-
   let laneData=[];
+  let didIntro=false;
+  let prevTonyRaised=0;
 
   function parseCSV(text){
     const lines=text.trim().split(/\r?\n/);
@@ -287,12 +298,12 @@ footer .org-info a:hover {
   }
 
   function setTimestamp(){
-    const el = document.getElementById('lastUpdated');
-  if(!el) return;
-  const now = new Date();
-  const datePart = now.toLocaleDateString([], {month:'short', day:'2-digit'});
-  const timePart = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  el.textContent = `Updated ${datePart}, ${timePart}`;
+    const el=document.getElementById('lastUpdated');
+    if(!el) return;
+    const now=new Date();
+    const datePart = now.toLocaleDateString([], {month:'short', day:'2-digit'});
+    const timePart = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    el.textContent = `Updated ${datePart}, ${timePart}`;
   }
 
   async function fetchRows(){
@@ -311,6 +322,13 @@ footer .org-info a:hover {
       const goal=Number(String(d.Goal||'10000').replace(/,/g,''));
       return { lane, name, raised, goal };
     });
+    // confetti if Tony increased
+    const tonyRow = rows.find(r => (r.Name||'').toLowerCase()==='tony drew');
+    if(tonyRow){
+      const currentRaised = Number(String(tonyRow.Raised||'0').replace(/,/g,''));
+      if(currentRaised > prevTonyRaised){ confettiBurst(); }
+      prevTonyRaised = currentRaised;
+    }
   }
 
   function rankLanes(){
@@ -319,51 +337,103 @@ footer .org-info a:hover {
     laneData.forEach(({lane})=>board.appendChild(lane));
   }
 
+  function geometryFor(lane){
+    const track=lane.querySelector('.track-area');
+    const startLine=lane.querySelector('.start-line');
+    const label=lane.querySelector('.progress');
+    const avatar=lane.querySelector('.avatar');
+    if(!track||!startLine||!label||!avatar) return null;
+
+    const trackRect = track.getBoundingClientRect();
+    const lineRect  = startLine.getBoundingClientRect();
+    const startX = Math.max(0, lineRect.right - trackRect.left) + 2;
+
+    const trackW  = track.clientWidth;
+    const labelW  = label.offsetWidth;
+    const avatarW = avatar.getBoundingClientRect().width || 72;
+
+    const minCenterX = startX + (avatarW/2);
+    const maxCenterX = Math.max(minCenterX, trackW - labelW - 10 - (avatarW/2));
+
+    return {track, label, avatar, minCenterX, maxCenterX, avatarW};
+  }
+
   function layout(){
     laneData.forEach(({lane, raised, goal})=>{
-      const track=lane.querySelector('.track-area');
-      const startLine=lane.querySelector('.start-line');
-      const label=lane.querySelector('.progress');
-      const avatar=lane.querySelector('.avatar');
-      if(!track||!startLine||!label||!avatar) return;
+      const g = geometryFor(lane);
+      if(!g) return;
 
       const pct=clamp(goal>0 ? (raised/goal)*100 : 0, 0, 100);
+      const centerX = g.minCenterX + (pct/100) * (g.maxCenterX - g.minCenterX);
+      g.avatar.style.left = (centerX - g.avatarW/2) + "px";
 
-      // geometry
-      const trackRect = track.getBoundingClientRect();
-      const lineRect  = startLine.getBoundingClientRect();
-
-      // start just after the yellow line
-      const startX = Math.max(0, lineRect.right - trackRect.left) + 2;
-
-      const trackW  = track.clientWidth;
-      const labelW  = label.offsetWidth;
-      const avatarW = avatar.getBoundingClientRect().width || 72;
-
-      // center-based travel; avoid colliding with the badge at right
-      const minCenterX = startX + (avatarW/2);
-      const maxCenterX = Math.max(minCenterX, trackW - labelW - 10 - (avatarW/2));
-      const centerX = minCenterX + (pct/100) * (maxCenterX - minCenterX);
-
-      avatar.style.left = (centerX - avatarW/2) + "px";
+      const label=lane.querySelector('.progress');
       label.textContent = `$${fmt(raised)} / $${fmt(goal)}`;
+
+      // If this is Tony, move the emoji to follow
+      if((lane.getAttribute('data-name')||'').toLowerCase()==='tony drew'){
+        const cta=document.getElementById('tonyCta');
+        if(cta){ cta.style.left = (centerX - g.avatarW/2 - 40) + 'px'; }
+      }
     });
+  }
+
+  // Intro: race to finish then back to real positions (first load only)
+  async function raceIntro(){
+    if(didIntro) return; didIntro=true;
+    // set to actual first (already done), then blast to finish
+    await new Promise(r=>setTimeout(r,500));
+    laneData.forEach(({lane})=>{
+      const g = geometryFor(lane); if(!g) return;
+      const finishLeft = (g.maxCenterX - g.avatarW/2) + 'px';
+      g.avatar.style.left = finishLeft;
+      if((lane.getAttribute('data-name')||'').toLowerCase()==='tony drew'){
+        const cta=document.getElementById('tonyCta');
+        if(cta) cta.style.left = (g.maxCenterX - g.avatarW/2 - 40) + 'px';
+      }
+    });
+    await new Promise(r=>setTimeout(r,1200));
+    layout(); // return to actual positions
+  }
+
+  function confettiBurst(){
+    const duration = 1200;
+    const end = Date.now() + duration;
+    (function frame(){
+      const timeLeft = end - Date.now();
+      if(timeLeft<=0) return;
+      const particle = document.createElement('div');
+      particle.textContent = ['🎉','✨','💛','⭐'][Math.floor(Math.random()*4)];
+      particle.style.position='fixed';
+      particle.style.left=(Math.random()*100)+'vw';
+      particle.style.top='0';
+      particle.style.fontSize='20px';
+      particle.style.opacity=1;
+      particle.style.transition='transform 1.2s ease-out, opacity 1.2s ease-out';
+      document.body.appendChild(particle);
+      setTimeout(()=>{
+        particle.style.transform=`translateY(${100+Math.random()*300}px) rotate(${Math.random()*720-360}deg)`;
+        particle.style.opacity=0;
+      },10);
+      setTimeout(()=>particle.remove(),1200);
+      if(Date.now()<end) requestAnimationFrame(frame);
+    })();
   }
 
   async function loadAndRender(){
     try{
       const rows=await fetchRows();
       mapLanes(rows);
-      rankLanes();   // reorder lanes based on Raised
-      layout();      // place avatars + amounts
+      rankLanes();
+      layout();
       setTimestamp();
+      if(!didIntro) raceIntro();
     }catch(e){
       console.error('Failed to load CSV:', e);
     }
   }
 
   loadAndRender();
-  window.addEventListener('load', layout);
   window.addEventListener('resize', layout);
   setInterval(loadAndRender, 60*1000);
   document.addEventListener('visibilitychange',()=>!document.hidden && loadAndRender());
